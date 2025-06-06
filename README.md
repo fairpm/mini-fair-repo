@@ -1,6 +1,6 @@
 # Mini FAIR Repo
 
-The Mini FAIR Repo is a plugin to transform your site into a [FAIR Repository](https://github.com/fairpm/fair-protocol), allowing you to serve packages directly from your own infrastructure into the FAIR system.
+The Mini FAIR plugin transforms your site into a [FAIR Repository](https://github.com/fairpm/fair-protocol), allowing you to serve packages directly from your own infrastructure into the FAIR system.
 
 
 ## Design Goals
@@ -25,7 +25,7 @@ Once you've got Mini FAIR installed, you'll need to create a DID for your packag
 
 This will begin the process of creating a new PLC DID for your package - a globally-unique ID identifying your package, which you can take with you even if you change repositories in the future.
 
-It will also create two cryptographic keys: a "rotation" key, used to manage the DID's details, as well as a "verification key", which is used to sign releases. These keys will be stored in your WordPress database - don't lose them, as you can't recover your DID if you lose your rotation key!
+It will also create two cryptographic keys: a "rotation" key, used to manage the DID's details, as well as a "verification key", which is used to sign releases. These keys will be stored in your WordPress database - **don't lose them, as you can't recover your DID if you lose your rotation key!**
 
 Once your DID has been created, it'll be published [in the global PLC Directory](https://web.plc.directory/resolve) if you want to double check it. You can also sync changes to the directory via the Dashboard if your site's URL changes, or (coming soon!) to rotate your keys.
 
