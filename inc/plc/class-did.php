@@ -52,6 +52,17 @@ class DID {
 		return array_map( fn ( $key ) => Keys\decode_private_key( $key ), $this->verification_keys );
 	}
 
+	/**
+	 * Get the internal post ID for this DID.
+	 *
+	 * Only use this if you absolutely need it.
+	 *
+	 * @return int|null
+	 */
+	public function get_internal_post_id() : ?int {
+		return $this->internal_id;
+	}
+
 	public function save() {
 		// If we don't have an internal ID, we need to create a new DID.
 		if ( ! $this->internal_id ) {
