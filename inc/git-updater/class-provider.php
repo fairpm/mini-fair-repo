@@ -105,8 +105,8 @@ class Provider implements ProviderInterface {
 		];
 		foreach ( $package->contributors as $contributor ) {
 			$data->authors[] = [
-				'name' => $contributor->display_name,
-				'url' => $contributor->profile,
+				'name' => $contributor['display_name'],
+				'url' => $contributor['profile'],
 			];
 		}
 
@@ -145,7 +145,9 @@ class Provider implements ProviderInterface {
 		// Releases.
 		$needs_auth = $package->is_private;
 		$releases = [];
-		foreach ( $package->rollback as $tag => $artifact_url ) {
+		$versions = $package->release_asset ? $package->release_assets : $package->rollback;
+
+		foreach ( $versions as $tag => $artifact_url ) {
 			$tag_ver = ltrim( $tag, 'v' );
 			$release = [
 				'version' => $tag_ver,

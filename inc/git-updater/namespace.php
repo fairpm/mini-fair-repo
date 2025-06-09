@@ -70,8 +70,9 @@ function update_fair_data( $repo ) : ?WP_Error {
 	// Ensure the tag data has been fetched.
 	$repo_api->get_remote_tag();
 	$errors = [];
+	$versions = $repo_api->type->release_asset ? $repo_api->type->release_assets : $repo_api->type->rollback;
 
-	foreach ( $repo_api->type->rollback as $tag => $url ) {
+	foreach ( $versions as $tag => $url ) {
 		// This probably wants to be tied to the commit SHA, so that
 		// if tags are changed, we refresh automatically.
 		$data = generate_artifact_metadata( $did, $url );
