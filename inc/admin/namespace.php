@@ -280,7 +280,7 @@ function render_edit_page( WP_Post $post ) {
 					<?php
 					printf(
 						__( 'Current DID Document in the <a href="%s">PLC Directory</a>.', 'minifair' ),
-						'https://web.plc.directory/' . $did->id
+						'https://web.plc.directory/did/' . $did->id
 					);
 					?>
 				</p>
