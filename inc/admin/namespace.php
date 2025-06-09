@@ -14,6 +14,7 @@ const PAGE_SLUG = 'minifair';
 function bootstrap() {
 	// Register the admin menu and page before the PLC DID post type is registered.
 	add_action( 'admin_menu', __NAMESPACE__ . '\\add_admin_menu', 0 );
+	add_action( 'post_action_sync', __NAMESPACE__ . '\\maybe_on_sync' );
 
 	// Hijack the post-new.php page to render our own form.
 	add_action( 'replace_editor', function ( $res, WP_Post $post ) {
@@ -201,6 +202,25 @@ function render_new_page( WP_Post $post ) {
 	</form>
 
 	<?php
+}
+
+function maybe_on_sync( int $post_id ) {
+	$post = get_post( $post_id );
+	if ( ! $post || $post->post_type !== DID::POST_TYPE ) {
+		return;
+	}
+
+	// Handle the form submission to sync the PLC DID with the PLC Directory.
+	check_admin_referer( NONCE_SYNC_ACTION );
+
+	$did = DID::from_post( $post );
+	try {
+		$did->update();
+		wp_redirect( get_edit_post_link( $did->get_internal_post_id(), 'raw' ) );
+		exit;
+	} catch ( \Exception $e ) {
+		wp_die( $e->getMessage(), __( 'Error Syncing PLC DID', 'minifair' ), [ 'response' => 500 ] );
+	}
 }
 
 function render_edit_page( WP_Post $post ) {
