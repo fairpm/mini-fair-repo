@@ -4,6 +4,7 @@ namespace MiniFAIR\PLC;
 
 use Elliptic\EC\KeyPair;
 use Exception;
+use MiniFAIR\API;
 use MiniFAIR\Keys;
 use WP_Post;
 
@@ -140,7 +141,7 @@ class DID {
 			alsoKnownAs: $last_op->alsoKnownAs,
 			services: [
 				'fairpm_repo' => [
-					'endpoint' => 'https://fairpm.example.com/test',
+					'endpoint' => rest_url( API\REST_NAMESPACE . '/packages/' . $this->id ),
 					'type' => 'FairPackageManagementRepo',
 				],
 			],
