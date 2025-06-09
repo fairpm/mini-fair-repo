@@ -105,8 +105,8 @@ class Provider implements ProviderInterface {
 		];
 		foreach ( $package->contributors as $contributor ) {
 			$data->authors[] = [
-				'name' => $contributor->display_name,
-				'url' => $contributor->profile,
+				'name' => $contributor['display_name'],
+				'url' => $contributor['profile'],
 			];
 		}
 
