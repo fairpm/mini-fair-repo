@@ -20,7 +20,7 @@ function on_load() : void {
 		return;
 	}
 
-	add_action( 'get_remote_repo_meta', __NAMESPACE__ . '\\update_on_get_remote_meta', 20, 1 ) ;
+	add_action( 'get_remote_repo_meta', __NAMESPACE__ . '\\update_on_get_remote_meta', 20, 2 ) ;
 }
 
 /**
@@ -30,7 +30,7 @@ function on_load() : void {
  */
 function update_on_get_remote_meta( \stdClass $batches ) : void {
 	foreach ( $batches as $repo ) {
-		$err = update_fair_data( $repo );
+		$err = update_fair_data( $repo, $repo_api );
 		if ( is_wp_error( $err ) ) {
 			// Log the error.
 			error_log( sprintf( 'Error updating FAIR data for %s: %s', $repo->git, $err->get_error_message() ) );
@@ -46,14 +46,12 @@ function update_on_get_remote_meta( \stdClass $batches ) : void {
  *
  * @return null|WP_Error Error if one occurred, null otherwise.
  */
-function update_fair_data( $repo ) : ?WP_Error {
+function update_fair_data( $repo, $repo_api ) : ?WP_Error {
 	if ( empty( $repo->did ) ) {
 		// Not a FAIR package, skip.
 		return null;
 	}
 
-	// Get the same singleton instance.
-	$repo_api = Singleton::get_instance( 'Fragen\\Git_Updater\\API\\API', (object) [] )->get_repo_api( $repo->git, $repo );
 	if ( null === $repo_api ) {
 		return null;
 	}
