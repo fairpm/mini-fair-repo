@@ -7,7 +7,7 @@ use Elliptic\EC\KeyPair;
 use MiniFAIR\PLC;
 use MiniFAIR\PLC\DID;
 use MiniFAIR\PLC\Util;
-use Fragen\Singleton;
+use Fragen\Git_Updater\API;
 use WP_Error;
 
 function bootstrap() : void {
@@ -26,16 +26,14 @@ function on_load() : void {
 /**
  * Update necessary FAIR data during the Git Updater get_remote_repo_meta().
  *
- * @param \stdClass $batches List of repositories to update.
+ * @param \stdClass $repo Repository to update.
+ * @param GitHub_API      Repository API object.
  */
-function update_on_get_remote_meta( \stdClass $batches ) : void {
-	foreach ( $batches as $repo ) {
-		$err = update_fair_data( $repo, $repo_api );
-		if ( is_wp_error( $err ) ) {
-			// Log the error.
-			error_log( sprintf( 'Error updating FAIR data for %s: %s', $repo->git, $err->get_error_message() ) );
-			continue;
-		}
+function update_on_get_remote_meta( \stdClass $repo, $repo_api ) : void {
+	$err = update_fair_data( $repo, $repo_api );
+	if ( is_wp_error( $err ) ) {
+		// Log the error.
+		error_log( sprintf( 'Error updating FAIR data for %s: %s', $repo->git, $err->get_error_message() ) );
 	}
 }
 
