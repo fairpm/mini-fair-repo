@@ -25,10 +25,10 @@ function on_load() : void {
 /**
  * Update necessary FAIR data during the Git Updater get_remote_repo_meta().
  *
- * @param \stdClass $repo Repository to update.
+ * @param stdClass $repo Repository to update.
  * @param object $repo_api Repository API object.
  */
-function update_on_get_remote_meta( \stdClass $repo, $repo_api ) : void {
+function update_on_get_remote_meta( stdClass $repo, $repo_api ) : void {
 	$err = update_fair_data( $repo, $repo_api );
 	if ( is_wp_error( $err ) ) {
 		// Log the error.
