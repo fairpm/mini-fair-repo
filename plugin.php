@@ -1,7 +1,13 @@
 <?php
 /**
  * Plugin Name: Mini FAIR
- * Author: Contributors
+ * Description: Create your own FAIR node.
+ * Version: 0.1
+ * Author: FAIR Contributors
+ * License: GPLv2
+ * Requires at least: 5.0
+ * Requires PHP: 7.4
+ * Text Domain: mini-fair
  */
 
 namespace MiniFAIR;
