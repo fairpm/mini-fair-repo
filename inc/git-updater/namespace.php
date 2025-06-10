@@ -116,7 +116,7 @@ function generate_artifact_metadata( DID $did, $url, $is_release_asset ) {
 	// Fetch the artifact.
 	$opt = $is_release_asset
 		? [ 'headers' => [ 'Accept' => 'application/octet-stream' ] ]
-		: '';
+		: [];
 	if ( ! empty( $artifact_metadata ) && isset( $artifact_metadata['etag'] ) ) {
 		$opt['headers']['If-None-Match'] = $artifact_metadata['etag'];
 	}
