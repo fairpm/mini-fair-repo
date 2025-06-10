@@ -103,7 +103,7 @@ function get_artifact_metadata( DID $did, $url ) {
 /**
  * @return array|WP_Error
  */
-function generate_artifact_metadata( DID $did, $url, $is_release_asset ) {
+function generate_artifact_metadata( DID $did, $url, bool $is_release_asset ) {
 	$signing_key = $did->get_verification_keys()[0] ?? null;
 	if ( ! $signing_key ) {
 		var_dump( 'No signing key found for DID' );
