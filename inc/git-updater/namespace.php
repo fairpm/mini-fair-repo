@@ -20,17 +20,15 @@ function on_load() : void {
 		return;
 	}
 
-	add_action( 'gu_get_remote_plugin', __NAMESPACE__ . '\\update_on_cron', 20, 1 ) ;
+	add_action( 'get_remote_repo_meta', __NAMESPACE__ . '\\update_on_get_remote_meta', 20, 1 ) ;
 }
 
 /**
- * Update necessary FAIR data on the Git Updater cron event.
+ * Update necessary FAIR data during the Git Updater get_remote_repo_meta().
  *
- * @todo Switch this to running on all updates, requires a change in GU.
- *
- * @param array $batches List of repositories to update.
+ * @param \stdClass $batches List of repositories to update.
  */
-function update_on_cron( array $batches ) : void {
+function update_on_get_remote_meta( \stdClass $batches ) : void {
 	foreach ( $batches as $repo ) {
 		$err = update_fair_data( $repo );
 		if ( is_wp_error( $err ) ) {
