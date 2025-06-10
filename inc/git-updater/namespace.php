@@ -68,7 +68,7 @@ function update_fair_data( $repo, $repo_api ) : ?WP_Error {
 	foreach ( $versions as $tag => $url ) {
 		// This probably wants to be tied to the commit SHA, so that
 		// if tags are changed, we refresh automatically.
-		$data = generate_artifact_metadata( $did, $url );
+		$data = generate_artifact_metadata( $did, $url, $repo_api->type->release_asset );
 		if ( is_wp_error( $data ) ) {
 			$errors[] = $data;
 		}
@@ -103,7 +103,7 @@ function get_artifact_metadata( DID $did, $url ) {
 /**
  * @return array|WP_Error
  */
-function generate_artifact_metadata( DID $did, $url ) {
+function generate_artifact_metadata( DID $did, $url, $is_release_asset ) {
 	$signing_key = $did->get_verification_keys()[0] ?? null;
 	if ( ! $signing_key ) {
 		var_dump( 'No signing key found for DID' );
@@ -114,11 +114,9 @@ function generate_artifact_metadata( DID $did, $url ) {
 	$artifact_metadata = get_option( 'minifair_artifact_' . $artifact_id, null );
 
 	// Fetch the artifact.
-	$opt = [
-		'headers' => [
-			// 'Accept' => 'application/octet-stream',
-		],
-	];
+	$opt = $is_release_asset
+		? [ 'headers' => [ 'Accept' => 'application/octet-stream' ] ]
+		: '';
 	if ( ! empty( $artifact_metadata ) && isset( $artifact_metadata['etag'] ) ) {
 		$opt['headers']['If-None-Match'] = $artifact_metadata['etag'];
 	}
