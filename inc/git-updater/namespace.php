@@ -173,6 +173,9 @@ function sign_artifact_data( KeyPair $key, $data ) {
 	return Util\base64url_encode( $compact );
 }
 
+/**
+ * @return false|stdClass
+ */
 function get_cache_data( $id ) {
 	$cache_key = 'mini-fair-' . md5( $id );
 	$cache = get_site_option( $cache_key );
@@ -184,7 +187,7 @@ function get_cache_data( $id ) {
 	return $cache[ $id ];
 }
 
-function set_cache_data( $response, $id ) {
+function set_cache_data( $response, $id ) : void {
 	$cache_key = 'mini-fair-' . md5( $id );
 	$timeout = '+12 hours';
 
