@@ -61,8 +61,6 @@ function update_fair_data( $repo, $repo_api ) : ?WP_Error {
 		return null;
 	}
 
-	// Ensure the tag data has been fetched.
-	$repo_api->get_remote_tag();
 	$errors = [];
 	$versions = $repo_api->type->release_asset ? $repo_api->type->release_assets : $repo_api->type->rollback;
 
