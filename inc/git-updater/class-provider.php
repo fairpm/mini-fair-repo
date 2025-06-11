@@ -97,6 +97,8 @@ class Provider implements ProviderInterface {
 		$data->license = 'GPL-2.0-or-later';
 		$data->keywords = $package->readme_tags ?? [];
 		$data->sections = $package->sections;
+		$data->banners = $package->banners;
+		$data->icons = $package->icons;
 
 		// Parse link back out of author string.
 		$data->authors[] = [
@@ -172,9 +174,6 @@ class Provider implements ProviderInterface {
 				'signature' => $artifact_metadata['signature'] ?? null,
 				'checksum' => $artifact_metadata['sha256'] ?? null,
 			];
-			// Other artifacts.
-			// 'banners'           => $remote->banners,
-			// 'icons'             => $remote->icons,
 
 			$releases[] = $release;
 		}
