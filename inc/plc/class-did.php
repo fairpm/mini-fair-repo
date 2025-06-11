@@ -4,6 +4,7 @@ namespace MiniFAIR\PLC;
 
 use Elliptic\EC\KeyPair;
 use Exception;
+use MiniFAIR\API;
 use MiniFAIR\Keys;
 use WP_Post;
 
@@ -50,6 +51,17 @@ class DID {
 	 */
 	public function get_verification_keys() : array {
 		return array_map( fn ( $key ) => Keys\decode_private_key( $key ), $this->verification_keys );
+	}
+
+	/**
+	 * Get the internal post ID for this DID.
+	 *
+	 * Only use this if you absolutely need it.
+	 *
+	 * @return int|null
+	 */
+	public function get_internal_post_id() : ?int {
+		return $this->internal_id;
 	}
 
 	public function save() {
@@ -129,7 +141,7 @@ class DID {
 			alsoKnownAs: $last_op->alsoKnownAs,
 			services: [
 				'fairpm_repo' => [
-					'endpoint' => 'https://fairpm.example.com/test',
+					'endpoint' => rest_url( API\REST_NAMESPACE . '/packages/' . $this->id ),
 					'type' => 'FairPackageManagementRepo',
 				],
 			],

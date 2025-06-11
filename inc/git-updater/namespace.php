@@ -7,7 +7,7 @@ use Elliptic\EC\KeyPair;
 use MiniFAIR\PLC;
 use MiniFAIR\PLC\DID;
 use MiniFAIR\PLC\Util;
-use Fragen\Singleton;
+use stdClass;
 use WP_Error;
 
 function bootstrap() : void {
@@ -20,24 +20,20 @@ function on_load() : void {
 		return;
 	}
 
-	add_action( 'gu_get_remote_plugin', __NAMESPACE__ . '\\update_on_cron', 20, 1 ) ;
+	add_action( 'get_remote_repo_meta', __NAMESPACE__ . '\\update_on_get_remote_meta', 20, 2 ) ;
 }
 
 /**
- * Update necessary FAIR data on the Git Updater cron event.
+ * Update necessary FAIR data during the Git Updater get_remote_repo_meta().
  *
- * @todo Switch this to running on all updates, requires a change in GU.
- *
- * @param array $batches List of repositories to update.
+ * @param stdClass $repo Repository to update.
+ * @param object $repo_api Repository API object.
  */
-function update_on_cron( array $batches ) : void {
-	foreach ( $batches as $repo ) {
-		$err = update_fair_data( $repo );
-		if ( is_wp_error( $err ) ) {
-			// Log the error.
-			error_log( sprintf( 'Error updating FAIR data for %s: %s', $repo->git, $err->get_error_message() ) );
-			continue;
-		}
+function update_on_get_remote_meta( stdClass $repo, $repo_api ) : void {
+	$err = update_fair_data( $repo, $repo_api );
+	if ( is_wp_error( $err ) ) {
+		// Log the error.
+		error_log( sprintf( 'Error updating FAIR data for %s: %s', $repo->git, $err->get_error_message() ) );
 	}
 }
 
@@ -48,14 +44,12 @@ function update_on_cron( array $batches ) : void {
  *
  * @return null|WP_Error Error if one occurred, null otherwise.
  */
-function update_fair_data( $repo ) : ?WP_Error {
+function update_fair_data( $repo, $repo_api ) : ?WP_Error {
 	if ( empty( $repo->did ) ) {
 		// Not a FAIR package, skip.
 		return null;
 	}
 
-	// Get the same singleton instance.
-	$repo_api = Singleton::get_instance( 'Fragen\\Git_Updater\\API\\API', (object) [] )->get_repo_api( $repo->git, $repo );
 	if ( null === $repo_api ) {
 		return null;
 	}
@@ -67,8 +61,6 @@ function update_fair_data( $repo ) : ?WP_Error {
 		return null;
 	}
 
-	// Ensure the tag data has been fetched.
-	$repo_api->get_remote_tag();
 	$errors = [];
 	$versions = $repo_api->type->release_asset ? $repo_api->type->release_assets : $repo_api->type->rollback;
 
@@ -123,7 +115,7 @@ function generate_artifact_metadata( DID $did, $url ) {
 	// Fetch the artifact.
 	$opt = [
 		'headers' => [
-			// 'Accept' => 'application/octet-stream',
+			'Accept' => 'application/octet-stream;q=1.0, */*;q=0.7',
 		],
 	];
 	if ( ! empty( $artifact_metadata ) && isset( $artifact_metadata['etag'] ) ) {
