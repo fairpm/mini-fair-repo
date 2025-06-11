@@ -189,9 +189,7 @@ function get_cache_data( $id ) {
 
 function set_cache_data( $response, $id ) : void {
 	$cache_key = 'mini-fair-' . md5( $id );
-	$timeout = '+12 hours';
-
-	$cache['timeout'] = strtotime( $timeout );
+	$cache['timeout'] = time() + ( 12 * HOUR_IN_SECONDS );
 	$cache[ $id ] = $response;
 
 	update_site_option( $cache_key, $cache );
