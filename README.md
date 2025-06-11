@@ -136,7 +136,7 @@ Theme Name: My Example Theme
 Theme ID: did:plc:abcd1234dcba
 Theme URI: Https://...
 ```
-Ensure your plugin or theme is set up correctly with Git Updater, and that you’re using the same site as you registered your DID with.
+Ensure your plugin or theme is set up correctly with [Git Updater](https://git-updater.com/knowledge-base/), and that you’re using the same site as you registered your DID with.
 Once that’s done, you’re ready to go - your package should integrate automatically with the FAIR system! You can use the [FAIR Plugin](https://github.com/fairpm/fair-plugin) to install your package directly by ID, and once it’s been installed once, discovery aggregators will start to list it.
 You can double-check your packages by checking the REST API endpoint at `/wp-json/minifair/v1/packages/{did}` (replace `{did}` with your package’s DID).
 ## Contributing
