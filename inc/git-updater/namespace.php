@@ -10,6 +10,8 @@ use MiniFAIR\PLC\Util;
 use Fragen\Singleton;
 use WP_Error;
 
+const KEY = 'minifair';
+
 function bootstrap() : void {
 	add_action( 'plugins_loaded', __NAMESPACE__ . '\\on_load' );
 }
@@ -129,13 +131,13 @@ function generate_artifact_metadata( DID $did, $url ) {
 	if ( ! empty( $artifact_metadata ) && isset( $artifact_metadata['etag'] ) ) {
 		$opt['headers']['If-None-Match'] = $artifact_metadata['etag'];
 	}
-	$res = get_cache_data( $url );
+	$res = wp_cache_get( KEY . md5( $url ) );
 	if ( ! $res ) {
 		$res = wp_remote_get( $url, $opt );
 		if ( is_wp_error( $res ) ) {
 			return $res;
 		}
-		set_cache_data( $res, $url );
+		wp_cache_set( KEY . md5( $url ), $res, '', 12 * HOUR_IN_SECONDS );
 	}
 
 	if ( 304 === $res['response']['code'] ) {
@@ -171,26 +173,4 @@ function sign_artifact_data( KeyPair $key, $data ) {
 	// Convert to compact (IEEE-P1363) form, then to base64url.
 	$compact = hex2bin( PLC\signature_to_compact( $key->ec, $signature ) );
 	return Util\base64url_encode( $compact );
-}
-
-/**
- * @return false|stdClass
- */
-function get_cache_data( $id ) {
-	$cache_key = 'mini-fair-' . md5( $id );
-	$cache = get_site_option( $cache_key );
-
-	if ( empty( $cache['timeout'] ) || time() > $cache['timeout'] ) {
-		return false;
-	}
-
-	return $cache[ $id ];
-}
-
-function set_cache_data( $response, $id ) : void {
-	$cache_key = 'mini-fair-' . md5( $id );
-	$cache['timeout'] = time() + ( 12 * HOUR_IN_SECONDS );
-	$cache[ $id ] = $response;
-
-	update_site_option( $cache_key, $cache );
 }
