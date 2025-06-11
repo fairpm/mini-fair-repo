@@ -132,10 +132,9 @@ function generate_artifact_metadata( DID $did, $url ) {
 	$res = get_cache_data( $url );
 	if ( ! $res ) {
 		$res = wp_remote_get( $url, $opt );
-	}
-	if ( is_wp_error( $res ) ) {
-		return $res;
-	} else {
+		if ( is_wp_error( $res ) ) {
+			return $res;
+		}
 		set_cache_data( $res, $url );
 	}
 
