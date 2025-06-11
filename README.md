@@ -55,7 +55,7 @@ wp plugin activate mini-fair
 Mini FAIR requires Git Updater for package management:
 ```bash
 # Download and install Git Updater
-wp plugin install git-updater --activate
+wp plugin install https://github.com/afragen/git-updater/archive/refs/heads/master.zip --activate
 ```
 ### 5. Development Environment Configuration
 #### Enable WordPress Debug Mode
