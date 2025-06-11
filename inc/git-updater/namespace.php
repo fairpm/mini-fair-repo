@@ -129,9 +129,14 @@ function generate_artifact_metadata( DID $did, $url ) {
 	if ( ! empty( $artifact_metadata ) && isset( $artifact_metadata['etag'] ) ) {
 		$opt['headers']['If-None-Match'] = $artifact_metadata['etag'];
 	}
-	$res = wp_remote_get( $url, $opt );
+	$res = get_cache_data( $url );
+	if ( ! $res ) {
+		$res = wp_remote_get( $url, $opt );
+	}
 	if ( is_wp_error( $res ) ) {
 		return $res;
+	} else {
+		set_cache_data( $res, $url );
 	}
 
 	if ( 304 === $res['response']['code'] ) {
@@ -167,4 +172,25 @@ function sign_artifact_data( KeyPair $key, $data ) {
 	// Convert to compact (IEEE-P1363) form, then to base64url.
 	$compact = hex2bin( PLC\signature_to_compact( $key->ec, $signature ) );
 	return Util\base64url_encode( $compact );
+}
+
+function get_cache_data( $id ) {
+	$cache_key = 'mini-fair-' . md5( $id );
+	$cache = get_site_option( $cache_key );
+
+	if ( empty( $cache['timeout'] ) || time() > $cache['timeout'] ) {
+		return false;
+	}
+
+	return $cache[ $id ];
+}
+
+function set_cache_data( $response, $id ) {
+	$cache_key = 'mini-fair-' . md5( $id );
+	$timeout = '+12 hours';
+
+	$cache['timeout'] = strtotime( $timeout );
+	$cache[ $id ] = $response;
+
+	update_site_option( $cache_key, $cache );
 }
