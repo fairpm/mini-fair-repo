@@ -7,8 +7,8 @@ use Elliptic\EC\KeyPair;
 use MiniFAIR\PLC;
 use MiniFAIR\PLC\DID;
 use MiniFAIR\PLC\Util;
-use WP_Error;
 use stdClass;
+use WP_Error;
 
 function bootstrap() : void {
 	add_action( 'plugins_loaded', __NAMESPACE__ . '\\on_load' );
