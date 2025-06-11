@@ -10,7 +10,7 @@ use MiniFAIR\PLC\Util;
 use Fragen\Singleton;
 use WP_Error;
 
-const KEY = 'minifair';
+const CACHE_PREFIX = 'minifair-';
 
 function bootstrap() : void {
 	add_action( 'plugins_loaded', __NAMESPACE__ . '\\on_load' );
