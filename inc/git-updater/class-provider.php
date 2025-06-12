@@ -97,8 +97,8 @@ class Provider implements ProviderInterface {
 		$data->license = 'GPL-2.0-or-later';
 		$data->keywords = $package->readme_tags ?? [];
 		$data->sections = $package->sections;
-		$data->banners = $package->banners;
 		$data->icons = $package->icons;
+		$data->banners = $package->banners;
 
 		// Parse link back out of author string.
 		$data->authors[] = [
@@ -161,6 +161,8 @@ class Provider implements ProviderInterface {
 
 				'artifacts' => [
 					'package' => [],
+					'icon' => [],
+					'banner' => [],
 				],
 			];
 			if ( $needs_auth ) {
@@ -174,6 +176,22 @@ class Provider implements ProviderInterface {
 				'signature' => $artifact_metadata['signature'] ?? null,
 				'checksum' => $artifact_metadata['sha256'] ?? null,
 			];
+
+			$other_assets = [
+				'banner' => $package->banners,
+				'icon' => $package->icons,
+			];
+			foreach( $other_assets as $key => $asset ) {
+				foreach ( $asset as $size => $url ) {
+					$image = getimagesize( $url );
+					$release['artifacts']['package'][$key][ $size ] = [
+						'url' => $url,
+						'mime-type' => str_ends_with($url,'.svg')? 'image/svg+xml' : $image	['mime'],
+						'height' => $image[1],
+						'width' => $image[0],
+					];
+				}
+			}
 
 			$releases[] = $release;
 		}
