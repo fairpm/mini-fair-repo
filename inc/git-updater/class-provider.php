@@ -154,8 +154,8 @@ class Provider implements ProviderInterface {
 			'icon' => $package->icons,
 		];
 		foreach( $other_assets as $key => $asset ) {
-			foreach ( $asset as $url ) {
-				if ( count( $asset ) > 1 && str_contains( $url, 's.w.org' ) ) {
+			foreach ( $asset as $asset_id => $url ) {
+				if ( $key === 'icon' && $asset_id === 'default' && count( $asset ) > 1 ) {
 					continue;
 				}
 				$image = getimagesize( $url );
