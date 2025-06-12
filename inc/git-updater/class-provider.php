@@ -159,11 +159,12 @@ class Provider implements ProviderInterface {
 					continue;
 				}
 				$image = getimagesize( $url );
+				list( $width, $height ) = $image;
 				$images[ $key ][] = [
 					'url' => $url,
 					'content-type' => str_ends_with( $url, '.svg' ) ? 'image/svg+xml' : $image['mime'],
-					'height' => $image[1] ?? null,
-					'width' => $image[0] ?? null,
+					'height' => $height ?? null,
+					'width' => $width ?? null,
 				];
 			}
 		}
