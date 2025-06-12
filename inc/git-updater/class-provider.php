@@ -156,7 +156,7 @@ class Provider implements ProviderInterface {
 		foreach( $other_assets as $key => $asset ) {
 			foreach ( $asset as $size => $url ) {
 				$image = getimagesize( $url );
-				$images[ $key ][ $size ] = [
+				$images[ $key ][] = [
 					'url' => $url,
 					'content-type' => str_ends_with( $url, '.svg' ) ? 'image/svg+xml' : $image['mime'],
 					'height' => $image[1] ?? null,
@@ -177,8 +177,6 @@ class Provider implements ProviderInterface {
 
 				'artifacts' => [
 					'package' => [],
-					'icon' => [],
-					'banner' => [],
 				],
 			];
 			if ( $needs_auth ) {
@@ -192,8 +190,7 @@ class Provider implements ProviderInterface {
 				'signature' => $artifact_metadata['signature'] ?? null,
 				'checksum' => $artifact_metadata['sha256'] ?? null,
 			];
-			$release['artifacts']['icon'] = $images['icon'];
-			$release['artifacts']['banner'] = $images['banner'];
+			$release['artifacts'][] = $images;
 
 			$releases[] = $release;
 		}
