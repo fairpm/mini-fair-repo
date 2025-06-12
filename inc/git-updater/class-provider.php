@@ -147,7 +147,25 @@ class Provider implements ProviderInterface {
 		// Releases.
 		$needs_auth = $package->is_private;
 		$releases = [];
+		$images = [];
 		$versions = $package->release_asset ? $package->release_assets : $package->rollback;
+
+		// Banners and icons.
+		$other_assets = [
+			'banner' => $package->banners,
+			'icon' => $package->icons,
+		];
+		foreach( $other_assets as $key => $asset ) {
+			foreach ( $asset as $size => $url ) {
+				$image = getimagesize( $url );
+				$images[ $key ][ $size ] = [
+					'url' => $url,
+					'content-type' => str_ends_with( $url, '.svg' ) ? 'image/svg+xml' : $image['mime'],
+					'height' => $image[1] ?? null,
+					'width' => $image[0] ?? null,
+				];
+			}
+		}
 
 		foreach ( $versions as $tag => $artifact_url ) {
 			$tag_ver = ltrim( $tag, 'v' );
@@ -173,23 +191,9 @@ class Provider implements ProviderInterface {
 				'content-type' => 'application/zip',
 				'signature' => $artifact_metadata['signature'] ?? null,
 				'checksum' => $artifact_metadata['sha256'] ?? null,
+				'icon' => $images['icon'],
+				'banner' => $images['banner'],
 			];
-
-			$other_assets = [
-				'banner' => $package->banners,
-				'icon' => $package->icons,
-			];
-			foreach( $other_assets as $key => $asset ) {
-				foreach ( $asset as $size => $url ) {
-					$image = getimagesize( $url );
-					$release['artifacts']['package'][ $key ][ $size ] = [
-						'url' => $url,
-						'content-type' => str_ends_with( $url, '.svg' )? 'image/svg+xml' : $image['mime'],
-						'height' => $image[1] ?? null,
-						'width' => $image[0] ?? null,
-					];
-				}
-			}
 
 			$releases[] = $release;
 		}
