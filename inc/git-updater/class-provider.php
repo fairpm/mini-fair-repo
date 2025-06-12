@@ -161,8 +161,6 @@ class Provider implements ProviderInterface {
 
 				'artifacts' => [
 					'package' => [],
-					'icon' => [],
-					'banner' => [],
 				],
 			];
 			if ( $needs_auth ) {
@@ -186,9 +184,9 @@ class Provider implements ProviderInterface {
 					$image = getimagesize( $url );
 					$release['artifacts']['package'][$key][ $size ] = [
 						'url' => $url,
-						'mime-type' => str_ends_with($url,'.svg')? 'image/svg+xml' : $image	['mime'],
-						'height' => $image[1],
-						'width' => $image[0],
+						'content-type' => str_ends_with($url,'.svg')? 'image/svg+xml' : $image['mime'],
+						'height' => $image[1] ?? null,
+						'width' => $image[0] ?? null,
 					];
 				}
 			}

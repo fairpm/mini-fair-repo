@@ -37,8 +37,6 @@ class MetadataDocument implements JsonSerializable {
 			'keywords' => $this->keywords,
 			'sections' => $this->sections,
 			'releases' => $this->releases,
-			'banners' => $this->banners,
-			'icons' => $this->icons,
 		];
 	}
 }
