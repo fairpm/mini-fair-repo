@@ -97,8 +97,6 @@ class Provider implements ProviderInterface {
 		$data->license = 'GPL-2.0-or-later';
 		$data->keywords = $package->readme_tags ?? [];
 		$data->sections = $package->sections;
-		$data->icons = $package->icons;
-		$data->banners = $package->banners;
 
 		// Parse link back out of author string.
 		$data->authors[] = [
