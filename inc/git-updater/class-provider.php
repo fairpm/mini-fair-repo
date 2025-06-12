@@ -177,6 +177,8 @@ class Provider implements ProviderInterface {
 
 				'artifacts' => [
 					'package' => [],
+					'icon' => [],
+					'banner' => [],
 				],
 			];
 			if ( $needs_auth ) {
@@ -189,9 +191,9 @@ class Provider implements ProviderInterface {
 				'content-type' => 'application/zip',
 				'signature' => $artifact_metadata['signature'] ?? null,
 				'checksum' => $artifact_metadata['sha256'] ?? null,
-				'icon' => $images['icon'],
-				'banner' => $images['banner'],
 			];
+			$release['artifacts']['icon'] = $images['icon'];
+			$release['artifacts']['banner'] = $images['banner'];
 
 			$releases[] = $release;
 		}
