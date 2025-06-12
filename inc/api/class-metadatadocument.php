@@ -15,8 +15,8 @@ class MetadataDocument implements JsonSerializable {
 	public array $security = [];
 	public array $keywords = [];
 	public array $sections = [];
-	public array $banners = [];
 	public array $icons = [];
+	public array $banners = [];
 
 	/**
 	 * @var ReleaseDocument[]
