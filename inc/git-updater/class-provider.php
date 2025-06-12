@@ -182,9 +182,9 @@ class Provider implements ProviderInterface {
 			foreach( $other_assets as $key => $asset ) {
 				foreach ( $asset as $size => $url ) {
 					$image = getimagesize( $url );
-					$release['artifacts']['package'][$key][ $size ] = [
+					$release['artifacts']['package'][ $key ][ $size ] = [
 						'url' => $url,
-						'content-type' => str_ends_with($url,'.svg')? 'image/svg+xml' : $image['mime'],
+						'content-type' => str_ends_with( $url, '.svg' )? 'image/svg+xml' : $image['mime'],
 						'height' => $image[1] ?? null,
 						'width' => $image[0] ?? null,
 					];
