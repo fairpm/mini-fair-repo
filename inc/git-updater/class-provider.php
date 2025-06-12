@@ -182,6 +182,7 @@ class Provider implements ProviderInterface {
 					'package' => [],
 				],
 			];
+			$release['artifacts'] = $images;
 			if ( $needs_auth ) {
 				$release['auth'] = [];
 			}
@@ -193,7 +194,6 @@ class Provider implements ProviderInterface {
 				'signature' => $artifact_metadata['signature'] ?? null,
 				'checksum' => $artifact_metadata['sha256'] ?? null,
 			];
-			$release['artifacts'][] = $images;
 
 			$releases[] = $release;
 		}
