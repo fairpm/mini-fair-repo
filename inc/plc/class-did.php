@@ -2,10 +2,10 @@
 
 namespace MiniFAIR\PLC;
 
-use Elliptic\EC\KeyPair;
 use Exception;
 use MiniFAIR\API;
 use MiniFAIR\Keys;
+use MiniFAIR\Keys\Key;
 use WP_Post;
 
 class DID {
@@ -40,14 +40,14 @@ class DID {
 	protected ?string $prev = null;
 
 	/**
-	 * @return KeyPair[]
+	 * @return Keys\ECKey[]
 	 */
 	public function get_rotation_keys() : array {
 		return array_map( fn ( $key ) => Keys\decode_private_key( $key ), $this->rotation_keys );
 	}
 
 	/**
-	 * @return KeyPair[]
+	 * @return Keys\EdDSAKey[]
 	 */
 	public function get_verification_keys() : array {
 		return array_map( fn ( $key ) => Keys\decode_private_key( $key ), $this->verification_keys );
@@ -294,17 +294,15 @@ class DID {
 		$did = new self();
 
 		// Generate an initial keypair for rotation.
-		$rotation_key = Keys\generate_keypair();
-		$encoded_rotation_key = Keys\encode_private_key( $rotation_key, Keys\CURVE_K256 );
+		$rotation_key = Keys\ECKey::generate( Keys\CURVE_K256 );
 		$did->rotation_keys = [
-			$encoded_rotation_key,
+			$rotation_key->encode_private(),
 		];
 
 		// Generate an initial keypair for verification.
-		$verification_key = Keys\generate_keypair();
-		$encoded_verification_key = Keys\encode_private_key( $verification_key, Keys\CURVE_K256 );
+		$verification_key = Keys\EdDSAKey::generate( Keys\CURVE_ED25519 );
 		$did->verification_keys = [
-			$encoded_verification_key,
+			$verification_key->encode_private(),
 		];
 
 		// Create the genesis operation.
@@ -315,22 +313,9 @@ class DID {
 			],
 			verificationMethods: [
 				VERIFICATION_METHOD_ID => $verification_key,
-				// 'atproto' => $verification_key,
 			],
 			alsoKnownAs: [],
 			services: [],
-			// 'services' => [
-			// 	'fairpm_repo' => [
-			// 		'serviceEndpoint' => 'https://fairpm.example.com/repo',
-			// 		'type' => 'FairPackageManagementRepo',
-			// 	],
-			// ],
-			// services: [
-			// 	'atproto_pds' => [
-			// 		'endpoint' => 'https://example.com/pds',
-			// 		'type' => 'AtprotoPersonalDataServer',
-			// 	],
-			// ],
 		);
 
 		// Sign the op, then generate the DID from it.

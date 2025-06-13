@@ -251,7 +251,7 @@ function render_edit_page( WP_Post $post ) {
 			<td>
 				<ol>
 					<?php foreach ( $did->get_rotation_keys() as $key ) : ?>
-						<li><code><?php echo esc_html( Keys\encode_public_key( $key, Keys\CURVE_K256 ) ); ?></code></li>
+						<li><code><?php echo esc_html( $key->encode_public() ); ?></code></li>
 					<?php endforeach; ?>
 				</ol>
 				<p class="description"><?php esc_html_e( 'Rotation keys are used to manage the DID itself.', 'minifair' ); ?></p>
@@ -264,7 +264,7 @@ function render_edit_page( WP_Post $post ) {
 			<td>
 				<ol>
 					<?php foreach ( $did->get_verification_keys() as $key ) : ?>
-						<li><code><?php echo esc_html( Keys\encode_public_key( $key, Keys\CURVE_K256 ) ); ?></code></li>
+						<li><code><?php echo esc_html( $key->encode_public() ); ?></code></li>
 					<?php endforeach; ?>
 				</ol>
 				<p class="description"><?php esc_html_e( 'Verification keys are used for package signing.', 'minifair' ); ?></p>

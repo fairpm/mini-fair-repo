@@ -2,8 +2,8 @@
 
 namespace MiniFAIR\PLC;
 
-use Elliptic\EC\KeyPair;
 use MiniFAIR\Keys;
+use MiniFAIR\Keys\Key;
 use Exception;
 use JsonSerializable;
 
@@ -93,7 +93,7 @@ class Operation implements JsonSerializable {
 		return true;
 	}
 
-	public function sign( KeyPair $rotation_key ) : SignedOperation {
+	public function sign( Key $rotation_key ) : SignedOperation {
 		return sign_operation( $this, $rotation_key );
 	}
 

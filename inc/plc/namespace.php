@@ -8,13 +8,9 @@ use CBOR\{
 	TextStringObject,
 };
 use CBOR\OtherObject\NullObject;
-use Elliptic\EC;
-use Elliptic\EC\KeyPair;
-use Elliptic\EC\Signature;
-use Elliptic\Utils;
 use MiniFAIR\Admin;
 use MiniFAIR\Keys;
-use Exception;
+use MiniFAIR\Keys\Key;
 use WP_CLI;
 use YOCLIB\Multiformats\Multibase\Multibase;
 
@@ -49,49 +45,24 @@ function register_types() {
 }
 
 /**
- * Convert a signature to compact (IEEE-P1363) representation.
- *
- * (Equivalent to secp256k1_ecdsa_sign_compact().)
- *
- * @internal Elliptic does not support compact signatures, only DER-encoded, so
- *           we need to do it ourselves. Compact signatures are just the r and
- *           s bytes concatenated, but must be padded to 32 bytes each.
- *
- * @param EC $ec The elliptic curve object.
- * @param Signature $signature The signature object.
- * @return string The compact signature.
- */
-function signature_to_compact( EC $ec, Signature $signature ) : string {
-	$byte_length = ceil( $ec->curve->n->bitLength() / 8);
-	$compact = Utils::toHex( $signature->r->toArray( 'be', $byte_length ) ) . Utils::toHex( $signature->s->toArray( 'be', $byte_length ) );
-	return $compact;
-}
-
-/**
  * Sign an operation.
  *
  * @param Operation $data The operation to sign.
- * @param KeyPair $signing_key The signing key.
+ * @param Key $signing_key The signing key.
  * @return SignedOperation The signed operation.
  */
-function sign_operation( Operation $data, KeyPair $signing_key ) : SignedOperation {
+function sign_operation( Operation $data, Key $key ) : SignedOperation {
 	// Validate the operation.
 	$data->validate();
 
 	// Encode the operation into DAG-CBOR.
 	$encoded = encode_operation( $data );
 
-	/**
-	 * Hash with SHA-256, then sign, using canonical (low-S) form.
-	 *
-	 * @var \Elliptic\EC\Signature
-	 */
-	$signature = $signing_key->sign( hash( 'sha256', $encoded, false ), 'hex', [
-		'canonical' => true
-	] );
+	// Sign the hash of the data.
+	$signature = $key->sign( hash( 'sha256', $encoded, false ) );
 
-	// Convert to compact (IEEE-P1363) form, then to base64url.
-	$sig_string = Util\base64url_encode( hex2bin( signature_to_compact( $signing_key->ec, $signature ) ) );
+	// Convert to base64url.
+	$sig_string = Util\base64url_encode( hex2bin( $signature ) );
 
 	return new SignedOperation( $data, $sig_string );
 }
@@ -129,13 +100,13 @@ function encode_operation( Operation $data ) : string {
 		)
 		->add(
 			TextStringObject::create( 'rotationKeys' ),
-			ListObject::create( array_map( fn ( KeyPair $key ) => TextStringObject::create( Keys\encode_did_key( $key, Keys\CURVE_K256 ) ), $data->rotationKeys ) )
+			ListObject::create( array_map( fn ( Key $key ) => TextStringObject::create( Keys\encode_did_key( $key ) ), $data->rotationKeys ) )
 		)
 		->add(
 			TextStringObject::create( 'verificationMethods' ),
-			CanonicalMapObject::create( array_map( fn ( string $key, KeyPair $value ) => MapItem::create(
+			CanonicalMapObject::create( array_map( fn ( string $key, Key $value ) => MapItem::create(
 				TextStringObject::create( $key ),
-				TextStringObject::create( Keys\encode_did_key( $value, Keys\CURVE_K256 ) )
+				TextStringObject::create( Keys\encode_did_key( $value ) )
 			), array_keys( $data->verificationMethods ), $data->verificationMethods ) )
 		);
 
