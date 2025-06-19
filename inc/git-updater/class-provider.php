@@ -101,7 +101,7 @@ class Provider implements ProviderInterface {
 		// Parse link back out of author string.
 		$data->authors[] = [
 			'name' => $package->author,
-			// todo: url
+			'url' => $package->author_uri ??  '',
 		];
 		foreach ( $package->contributors as $contributor ) {
 			$data->authors[] = [
