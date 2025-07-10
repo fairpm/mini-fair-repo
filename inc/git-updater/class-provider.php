@@ -192,7 +192,7 @@ class Provider implements ProviderInterface {
 			$artifact_metadata = get_artifact_metadata( $did, $artifact_url );
 			$release['artifacts']['package'][] = [
 				'url' => $artifact_url,
-				'content-type' => 'application/zip',
+				'content-type' => $package->release_asset ? 'application/octet-stream' : 'application/zip',
 				'signature' => $artifact_metadata['signature'] ?? null,
 				'checksum' => $artifact_metadata['sha256'] ?? null,
 			];
