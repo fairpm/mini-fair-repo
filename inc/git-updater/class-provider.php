@@ -94,6 +94,7 @@ class Provider implements ProviderInterface {
 		$data->name = $package->name;
 		$data->slug = $package->slug;
 		$data->file = $package->file;
+		$data->release_asset = $package->release_asset;
 		$data->description = substr( strip_tags( trim( $package->sections['description'] ) ), 0, 139 ) . '…';
 		$data->license = 'GPL-2.0-or-later';
 		$data->keywords = $package->readme_tags ?? [];
