@@ -104,12 +104,12 @@ class Provider implements ProviderInterface {
 			'name' => $package->author,
 			'url' => $package->author_uri ??  '',
 		];
-		foreach ( $package->contributors as $contributor ) {
-			$data->authors[] = [
-				'name' => $contributor['display_name'],
-				'url' => $contributor['profile'],
-			];
-		}
+		//foreach ( $package->contributors as $contributor ) {
+		//	$data->authors[] = [
+		//		'name' => $contributor['display_name'],
+		//		'url' => $contributor['profile'],
+		//	];
+		//}
 
 		// Releases.
 		$data->releases = $this->get_release_data( $did, $package );
