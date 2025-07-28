@@ -95,7 +95,7 @@ class Provider implements ProviderInterface {
 		$data->slug = $package->slug;
 		$data->filename = $package->file;
 		$data->description = substr( strip_tags( trim( $package->sections['description'] ) ), 0, 139 ) . '…';
-		$data->license = 'GPL-2.0-or-later';
+		$data->license = $package->license ?? 'GPL-2.0-or-later';
 		$data->keywords = $package->readme_tags ?? [];
 		$data->sections = $package->sections;
 
