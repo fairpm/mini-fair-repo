@@ -147,7 +147,7 @@ class Provider implements ProviderInterface {
 		$needs_auth = $package->is_private;
 		$releases = [];
 		$images = [];
-		$versions = $package->release_asset ? $package->release_assets : $package->rollback;
+		$versions = $package->release_asset ? $package->release_assets : $package->tags;
 
 		// Banners and icons.
 		$other_assets = [
