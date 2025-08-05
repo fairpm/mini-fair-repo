@@ -64,7 +64,7 @@ function update_fair_data( $repo, $repo_api ) : ?WP_Error {
 	}
 
 	$errors = [];
-	$versions = $repo_api->type->release_asset ? $repo_api->type->release_assets : $repo_api->type->rollback;
+	$versions = $repo_api->type->release_asset ? $repo_api->type->release_assets : $repo_api->type->tags;
 
 	foreach ( $versions as $tag => $url ) {
 		// This probably wants to be tied to the commit SHA, so that
