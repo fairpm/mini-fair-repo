@@ -17,6 +17,13 @@ function bootstrap() : void {
 }
 
 function register_routes() : void {
+	register_rest_route( REST_NAMESPACE, '/packages/?', [
+		'show_in_index' => true,
+		'methods' => WP_REST_Server::READABLE,
+		'callback' => __NAMESPACE__ . '\\get_packages_data',
+		'permission_callback' => '__return_true',
+	] );
+
 	register_rest_route( REST_NAMESPACE, '/packages/(?P<id>did:\w+:[\w-]+)', [
 		'show_in_index' => true,
 		'methods' => WP_REST_Server::READABLE,
@@ -39,6 +46,24 @@ function register_routes() : void {
 			],
 		],
 	] );
+}
+
+function get_packages_data( WP_REST_Request $request ) {
+	$response = [];
+	$packages = MiniFAIR\get_available_packages();
+	foreach ( $packages as $package_id ) {
+		$did = DID::get( $package_id );
+		if ( ! $did ) {
+			continue;
+		}
+		$metadata = MiniFAIR\get_package_metadata( $did );
+		if ( is_null( $metadata ) ) {
+			continue;
+		}
+		$response[] = $metadata;
+	}
+
+	return $response;
 }
 
 function get_package_data( WP_REST_Request $request ) {
