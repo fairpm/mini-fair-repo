@@ -2,6 +2,9 @@
 
 namespace MiniFAIR;
 
+const CACHE_PREFIX = 'minifair-';
+const CACHE_LIFETIME = 12 * HOUR_IN_SECONDS;
+
 use Exception;
 use MiniFAIR\PLC\DID;
 
@@ -47,4 +50,25 @@ function get_package_metadata( DID $did ) {
 	}
 
 	return null;
+}
+
+/**
+ * @throws Exception
+ * @param string $url URL.
+ * @param string $method Calling method.
+ * @param array $opt wp_remote_get options.
+ * @return stdClass
+ */
+function get_remote_url( $url, $method, $opt = null ) {
+	$opt = $opt ?? [ 'headers' => [ 'Accept' => 'application/did+ld+json' ] ];
+	$response = wp_cache_get( CACHE_PREFIX . sha1( $url ) );
+	if ( ! $response ) {
+		$response = wp_remote_get( $url, $opt );
+		if ( is_wp_error( $response ) ) {
+			throw new Exception( "Error {$method}: " . $response->get_error_message() );
+		}
+		wp_cache_set( CACHE_PREFIX . sha1( $url ), $response, '', CACHE_LIFETIME );
+	}
+
+	return $response;
 }

@@ -4,6 +4,7 @@ namespace MiniFAIR\PLC;
 
 use Elliptic\EC\KeyPair;
 use Exception;
+use MiniFAIR;
 use MiniFAIR\API;
 use MiniFAIR\Keys;
 use WP_Post;
@@ -171,14 +172,7 @@ class DID {
 	 */
 	public function fetch_last_op() : Operation {
 		$url = sprintf( '%s/%s/log/last', static::DIRECTORY_API, $this->id );
-		$response = wp_remote_get( $url, [
-			'headers' => [
-				'Accept' => 'application/did+ld+json',
-			],
-		] );
-		if ( is_wp_error( $response ) ) {
-			throw new Exception( 'Error fetching last op: ' . $response->get_error_message() );
-		}
+		$response = MiniFAIR\get_remote_url( $url, __METHOD__ );
 
 		$data = json_decode( wp_remote_retrieve_body( $response ), true );
 		if ( json_last_error() !== JSON_ERROR_NONE ) {
@@ -206,14 +200,7 @@ class DID {
 	 */
 	public function fetch_audit_log() {
 		$url = sprintf( '%s/%s/log/audit', static::DIRECTORY_API, $this->id );
-		$response = wp_remote_get( $url, [
-			'headers' => [
-				'Accept' => 'application/did+ld+json',
-			],
-		] );
-		if ( is_wp_error( $response ) ) {
-			return false;
-		}
+		$response = MiniFAIR\get_remote_url( $url, __METHOD__ );
 
 		$data = json_decode( wp_remote_retrieve_body( $response ), true );
 		if ( json_last_error() !== JSON_ERROR_NONE ) {
@@ -223,29 +210,9 @@ class DID {
 		return $data;
 	}
 
-	public function refresh() {
-		// $url = sprintf( '%s/%s', static::DIRECTORY_API, $this->id );
-		// $response = wp_remote_get( $url, [
-		// 	'headers' => [
-		// 		'Accept' => 'application/did+ld+json',
-		// 	],
-		// ] );
-		// if ( is_wp_error( $response ) ) {
-		// 	return false;
-		// }
-	}
-
 	public function is_published() {
-		$this->refresh();
 		$url = sprintf( 'https://plc.directory/%s', $this->id );
-		$response = wp_remote_get( $url, [
-			'headers' => [
-				'Accept' => 'application/did+ld+json',
-			],
-		] );
-		if ( is_wp_error( $response ) ) {
-			return false;
-		}
+		$response = MiniFAIR\get_remote_url( $url, __METHOD__ );
 
 		// 404 = not found
 		// 410 = gone (tombstone)
