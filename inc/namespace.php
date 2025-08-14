@@ -53,21 +53,20 @@ function get_package_metadata( DID $did ) {
 }
 
 /**
- * @throws Exception
  * @param string $url URL.
- * @param string $method Calling method.
  * @param array $opt wp_remote_get options.
- * @return stdClass
+ * @return array|WP_Error
  */
-function get_remote_url( $url, $method, $opt = null ) {
+function get_remote_url( $url, $opt = null ) {
 	$opt = $opt ?? [ 'headers' => [ 'Accept' => 'application/did+ld+json' ] ];
-	$response = wp_cache_get( CACHE_PREFIX . sha1( $url ) );
+	$cache_key = CACHE_PREFIX . sha1( $url );
+	$response = wp_cache_get( $cache_key );
 	if ( ! $response ) {
 		$response = wp_remote_get( $url, $opt );
 		if ( is_wp_error( $response ) ) {
-			throw new Exception( "Error {$method}: " . $response->get_error_message() );
+			return $response;
 		}
-		wp_cache_set( CACHE_PREFIX . sha1( $url ), $response, '', CACHE_LIFETIME );
+		wp_cache_set( $cache_key, $response, '', CACHE_LIFETIME );
 	}
 
 	return $response;

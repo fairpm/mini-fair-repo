@@ -172,7 +172,7 @@ class DID {
 	 */
 	public function fetch_last_op() : Operation {
 		$url = sprintf( '%s/%s/log/last', static::DIRECTORY_API, $this->id );
-		$response = MiniFAIR\get_remote_url( $url, __METHOD__ );
+		$response = MiniFAIR\get_remote_url( $url );
 
 		$data = json_decode( wp_remote_retrieve_body( $response ), true );
 		if ( json_last_error() !== JSON_ERROR_NONE ) {
@@ -200,7 +200,7 @@ class DID {
 	 */
 	public function fetch_audit_log() {
 		$url = sprintf( '%s/%s/log/audit', static::DIRECTORY_API, $this->id );
-		$response = MiniFAIR\get_remote_url( $url, __METHOD__ );
+		$response = MiniFAIR\get_remote_url( $url );
 
 		$data = json_decode( wp_remote_retrieve_body( $response ), true );
 		if ( json_last_error() !== JSON_ERROR_NONE ) {
@@ -212,7 +212,7 @@ class DID {
 
 	public function is_published() {
 		$url = sprintf( 'https://plc.directory/%s', $this->id );
-		$response = MiniFAIR\get_remote_url( $url, __METHOD__ );
+		$response = MiniFAIR\get_remote_url( $url );
 
 		// 404 = not found
 		// 410 = gone (tombstone)

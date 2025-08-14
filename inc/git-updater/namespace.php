@@ -123,7 +123,7 @@ function generate_artifact_metadata( DID $did, $url ) {
 		$opt['headers']['If-None-Match'] = $artifact_metadata['etag'];
 	}
 
-	$res = MiniFAIR\get_remote_url( $url, __METHOD__, $opt );
+	$res = MiniFAIR\get_remote_url( $url, $opt );
 
 	if ( 304 === $res['response']['code'] ) {
 		// Not modified, no need to update.
