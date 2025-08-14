@@ -129,6 +129,9 @@ class DID {
 	protected function prepare_update_op() : ?SignedOperation {
 		// Fetch the previous op.
 		$last_op = $this->fetch_last_op();
+		if ( is_wp_error( $last_op ) ) {
+			return $last_op;
+		}
 
 		// Get it as a CID.
 		$last_cid = cid_for_operation( $last_op );
