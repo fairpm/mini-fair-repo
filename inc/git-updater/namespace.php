@@ -124,6 +124,9 @@ function generate_artifact_metadata( DID $did, $url ) {
 	}
 
 	$res = MiniFAIR\get_remote_url( $url, $opt );
+	if ( is_wp_error( $res ) ) {
+		return $res;
+	}
 
 	if ( 304 === $res['response']['code'] ) {
 		// Not modified, no need to update.
