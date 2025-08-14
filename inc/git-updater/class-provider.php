@@ -104,7 +104,8 @@ class Provider implements ProviderInterface {
 			$data->security[][ $security_key ] = $package->security ?? '';
 		}
 
-		$data->keywords = $package->readme_tags ?? [];
+		$data->license = $package->license ?? 'GPL-2.0-or-later';
+		$data->keywords = $package->readme_tags ? array_values( $package->readme_tags ) : [];
 		$data->sections = $package->sections;
 
 		// Parse link back out of author string.
@@ -155,7 +156,7 @@ class Provider implements ProviderInterface {
 		$needs_auth = $package->is_private;
 		$releases = [];
 		$images = [];
-		$versions = $package->release_asset ? $package->release_assets : $package->rollback;
+		$versions = $package->release_asset ? $package->release_assets : $package->tags;
 
 		// Banners and icons.
 		$other_assets = [
