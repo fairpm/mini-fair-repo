@@ -39,6 +39,14 @@ function register_routes() : void {
 			],
 		],
 	] );
+
+	register_rest_route( REST_NAMESPACE, '/packages', [
+		'show_in_index' => true,
+		'methods' => WP_REST_Server::READABLE,
+		'callback' => __NAMESPACE__ . '\\get_packages',
+		'permission_callback' => '__return_true',
+		'args' => [],
+	] );
 }
 
 function get_package_data( WP_REST_Request $request ) {
@@ -83,4 +91,8 @@ function get_package_data( WP_REST_Request $request ) {
 	}
 
 	return $response;
+}
+
+function get_packages() {
+	return MiniFAIR\get_available_packages();
 }
