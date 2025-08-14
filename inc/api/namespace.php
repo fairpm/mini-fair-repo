@@ -94,5 +94,9 @@ function get_package_data( WP_REST_Request $request ) {
 }
 
 function get_packages() {
-	return MiniFAIR\get_available_packages();
+	return array_filter( MiniFAIR\get_available_packages(),
+		function ( $package_did ) {
+			return null !== DID::get( $package_did );
+		}
+	);
 }
