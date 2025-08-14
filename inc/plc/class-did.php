@@ -7,7 +7,6 @@ use Exception;
 use MiniFAIR;
 use MiniFAIR\API;
 use MiniFAIR\Keys;
-use WP_Error;
 use WP_Post;
 
 class DID {
@@ -129,9 +128,6 @@ class DID {
 	protected function prepare_update_op() : ?SignedOperation {
 		// Fetch the previous op.
 		$last_op = $this->fetch_last_op();
-		if ( is_wp_error( $last_op ) ) {
-			return $last_op;
-		}
 
 		// Get it as a CID.
 		$last_cid = cid_for_operation( $last_op );
@@ -172,13 +168,13 @@ class DID {
 
 	/**
 	 * @throws Exception
-	 * @return Operation|WP_Error
+	 * @return Operation
 	 */
 	public function fetch_last_op() : Operation {
 		$url = sprintf( '%s/%s/log/last', static::DIRECTORY_API, $this->id );
 		$response = MiniFAIR\get_remote_url( $url );
 		if ( is_wp_error( $response ) ) {
-			return $response;
+			throw new Exception( 'Error fetching last op: ' . $response->get_error_message() );
 		}
 
 		$data = json_decode( wp_remote_retrieve_body( $response ), true );
@@ -209,7 +205,7 @@ class DID {
 		$url = sprintf( '%s/%s/log/audit', static::DIRECTORY_API, $this->id );
 		$response = MiniFAIR\get_remote_url( $url );
 		if ( is_wp_error( $response ) ) {
-			return $response;
+			return false;
 		}
 
 		$data = json_decode( wp_remote_retrieve_body( $response ), true );
@@ -227,7 +223,7 @@ class DID {
 		$url = sprintf( 'https://plc.directory/%s', $this->id );
 		$response = MiniFAIR\get_remote_url( $url );
 		if ( is_wp_error( $response ) ) {
-			return $response;
+			return false;
 		}
 
 		// 404 = not found
