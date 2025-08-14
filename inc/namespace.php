@@ -7,6 +7,7 @@ const CACHE_LIFETIME = 12 * HOUR_IN_SECONDS;
 
 use Exception;
 use MiniFAIR\PLC\DID;
+use WP_Error;
 
 function bootstrap() {
 	Admin\bootstrap();

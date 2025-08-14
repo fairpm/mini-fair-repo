@@ -7,6 +7,7 @@ use Exception;
 use MiniFAIR;
 use MiniFAIR\API;
 use MiniFAIR\Keys;
+use WP_Error;
 use WP_Post;
 
 class DID {
@@ -168,11 +169,14 @@ class DID {
 
 	/**
 	 * @throws Exception
-	 * @return Operation
+	 * @return Operation|WP_Error
 	 */
 	public function fetch_last_op() : Operation {
 		$url = sprintf( '%s/%s/log/last', static::DIRECTORY_API, $this->id );
 		$response = MiniFAIR\get_remote_url( $url );
+		if ( is_wp_error( $response ) ) {
+			return $response;
+		}
 
 		$data = json_decode( wp_remote_retrieve_body( $response ), true );
 		if ( json_last_error() !== JSON_ERROR_NONE ) {
