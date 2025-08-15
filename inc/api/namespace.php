@@ -82,5 +82,7 @@ function get_package_data( WP_REST_Request $request ) {
 		);
 	}
 
+	wp_cache_set( 'rest-endpoint-' . $id, $response, 'metadata-endpoints', MiniFAIR\CACHE_LIFETIME );
+
 	return $response;
 }
