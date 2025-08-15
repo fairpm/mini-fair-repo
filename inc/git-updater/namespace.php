@@ -4,13 +4,12 @@ namespace MiniFAIR\Git_Updater;
 
 
 use Elliptic\EC\KeyPair;
+use MiniFAIR;
 use MiniFAIR\PLC;
 use MiniFAIR\PLC\DID;
 use MiniFAIR\PLC\Util;
 use stdClass;
 use WP_Error;
-
-const CACHE_PREFIX = 'minifair-';
 
 function bootstrap() : void {
 	add_action( 'plugins_loaded', __NAMESPACE__ . '\\on_load' );
@@ -123,13 +122,10 @@ function generate_artifact_metadata( DID $did, $url ) {
 	if ( ! empty( $artifact_metadata ) && isset( $artifact_metadata['etag'] ) ) {
 		$opt['headers']['If-None-Match'] = $artifact_metadata['etag'];
 	}
-	$res = wp_cache_get( CACHE_PREFIX . sha1( $url ) );
-	if ( ! $res ) {
-		$res = wp_remote_get( $url, $opt );
-		if ( is_wp_error( $res ) ) {
-			return $res;
-		}
-		wp_cache_set( CACHE_PREFIX . sha1( $url ), $res, '', 12 * HOUR_IN_SECONDS );
+
+	$res = MiniFAIR\get_remote_url( $url, $opt );
+	if ( is_wp_error( $res ) ) {
+		return $res;
 	}
 
 	if ( 304 === $res['response']['code'] ) {
