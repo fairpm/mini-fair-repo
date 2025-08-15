@@ -70,7 +70,7 @@ class EdDSAKey implements Key {
 
 		$priv = $this->keypair->getSecret( 'hex' );
 		$prefix = match ( $this->curve ) {
-			CURVE_ED25519 => bin2hex( PREFIX_CURVE_ED25519 ),
+			CURVE_ED25519 => bin2hex( PREFIX_CURVE_ED25519_PRIVATE ),
 			default => throw new Exception( 'Unsupported curve' ),
 		};
 		$encoded = Multibase::encode( Multibase::BASE58BTC, hex2bin( $prefix . $priv ) );
@@ -130,6 +130,9 @@ class EdDSAKey implements Key {
 		$decoded = Multibase::decode( $key );
 
 		$curve = match ( substr( $decoded, 0, 2 ) ) {
+			PREFIX_CURVE_ED25519_PRIVATE => CURVE_ED25519,
+
+			// todo: Legacy, remove this later.
 			PREFIX_CURVE_ED25519 => CURVE_ED25519,
 			default => throw new Exception( 'Unsupported curve' ),
 		};

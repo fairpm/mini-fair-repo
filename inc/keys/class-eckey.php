@@ -57,8 +57,8 @@ class ECKey implements Key {
 
 		$priv = $this->keypair->getPrivate( 'hex' );
 		$prefix = match ( $this->curve ) {
-			CURVE_K256 => bin2hex( PREFIX_CURVE_K256 ),
-			CURVE_P256 => bin2hex( PREFIX_CURVE_P256 ),
+			CURVE_K256 => bin2hex( PREFIX_CURVE_K256_PRIVATE ),
+			CURVE_P256 => bin2hex( PREFIX_CURVE_P256_PRIVATE ),
 			default => throw new Exception( 'Unsupported curve' ),
 		};
 		$encoded = Multibase::encode( Multibase::BASE58BTC, hex2bin( $prefix . $priv ));
@@ -165,6 +165,10 @@ class ECKey implements Key {
 		$decoded = Multibase::decode( $key );
 
 		$curve = match ( substr( $decoded, 0, 2 ) ) {
+			PREFIX_CURVE_P256_PRIVATE => CURVE_P256,
+			PREFIX_CURVE_K256_PRIVATE = CURVE_K256,
+
+			// todo: Legacy, remove this later.
 			PREFIX_CURVE_P256 => CURVE_P256,
 			PREFIX_CURVE_K256 => CURVE_K256,
 			default => throw new Exception( 'Unsupported curve' ),
