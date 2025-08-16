@@ -7,6 +7,7 @@ We aim to make it possible for everyone to run Mini FAIR, with a focus on ease o
 ## Requirements
 - PHP 7.4 or higher
 - WordPress 5.0 or higher
+- [Persistant Object Cache](https://developer.wordpress.org/reference/classes/wp_object_cache/#persistent-caching)
 - [Composer](https://getcomposer.org/) for dependency management
 - [Git Updater](https://git-updater.com/) plugin (for integration)
 ## Local Installation & Development Setup
