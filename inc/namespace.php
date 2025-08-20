@@ -8,6 +8,7 @@ use MiniFAIR\PLC\DID;
 function bootstrap() {
 	Admin\bootstrap();
 	API\bootstrap();
+	Keys\bootstrap();
 	Git_Updater\bootstrap();
 	PLC\bootstrap();
 }

@@ -28,6 +28,17 @@ const PREFIX_CURVE_ED25519 = "\xed\x01";
 const PREFIX_CURVE_ED25519_PRIVATE = "\x80\x26"; // 0x1300
 
 /**
+ * Bootstrap.
+ *
+ * @return void
+ */
+function bootstrap() {
+	require_once __DIR__ . '/class-key.php';
+	require_once __DIR__ . '/class-eckey.php';
+	require_once __DIR__ . '/class-eddsakey.php';
+}
+
+/**
  * Convert a multibase public key string to a keypair object.
  *
  * @see https://atproto.com/specs/cryptography
