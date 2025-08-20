@@ -12,6 +12,7 @@ use WP_Error;
 function bootstrap() {
 	Admin\bootstrap();
 	API\bootstrap();
+	Keys\bootstrap();
 	Git_Updater\bootstrap();
 	PLC\bootstrap();
 }
