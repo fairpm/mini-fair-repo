@@ -72,6 +72,11 @@ function decode_private_key( string $key ) : Key {
 	$decoded = Multibase::decode( $key );
 
 	$keypair = match ( substr( $decoded, 0, 2 ) ) {
+		PREFIX_CURVE_P256_PRIVATE => ECKey::from_private( $key ),
+		PREFIX_CURVE_K256_PRIVATE => ECKey::from_private( $key ),
+		PREFIX_CURVE_ED25519_PRIVATE => EdDSAKey::from_private( $key ),
+
+		// todo: Legacy, remove this later.
 		PREFIX_CURVE_P256    => ECKey::from_private( $key ),
 		PREFIX_CURVE_K256    => ECKey::from_private( $key ),
 		PREFIX_CURVE_ED25519 => EdDSAKey::from_private( $key ),
