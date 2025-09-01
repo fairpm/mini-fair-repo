@@ -1,4 +1,8 @@
 {
+    "name": "fairpm/mini-fair-repo",
+    "description": "Mini Fair Repository - A WordPress plugin for decentralized content management",
+    "type": "wordpress-plugin",
+    "license": "MIT",
     "require": {
         "yocto/yoclib-multibase": "^1.2",
         "simplito/elliptic-php": "^1.0",
