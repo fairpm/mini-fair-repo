@@ -39,6 +39,14 @@ function register_routes() : void {
 			],
 		],
 	] );
+
+	register_rest_route( REST_NAMESPACE, '/packages', [
+		'show_in_index' => true,
+		'methods' => WP_REST_Server::READABLE,
+		'callback' => __NAMESPACE__ . '\\get_packages',
+		'permission_callback' => '__return_true',
+		'args' => [],
+	] );
 }
 
 function get_package_data( WP_REST_Request $request ) {
@@ -82,5 +90,15 @@ function get_package_data( WP_REST_Request $request ) {
 		);
 	}
 
+	wp_cache_set( 'fair-metadata-endpoint-' . $id, $response, 'metadata-endpoints', MiniFAIR\CACHE_LIFETIME );
+
 	return $response;
+}
+
+function get_packages() {
+	return array_filter( MiniFAIR\get_available_packages(),
+		function ( $package_did ) {
+			return null !== DID::get( $package_did );
+		}
+	);
 }

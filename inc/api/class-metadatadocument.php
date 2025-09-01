@@ -9,6 +9,7 @@ class MetadataDocument implements JsonSerializable {
 	public string $type;
 	public string $name;
 	public string $slug;
+	public string $filename;
 	public string $description;
 	public array $authors = [];
 	public string $license;
@@ -29,6 +30,7 @@ class MetadataDocument implements JsonSerializable {
 			'type' => $this->type,
 			'name' => $this->name,
 			'slug' => $this->slug,
+			'filename' => $this->filename,
 			'description' => $this->description,
 			'authors' => $this->authors,
 			'license' => $this->license,

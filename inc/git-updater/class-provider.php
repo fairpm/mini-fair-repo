@@ -93,22 +93,23 @@ class Provider implements ProviderInterface {
 		$data->type = 'wp-' . $package->type;
 		$data->name = $package->name;
 		$data->slug = $package->slug;
+		$data->filename = $package->file;
 		$data->description = substr( strip_tags( trim( $package->sections['description'] ) ), 0, 139 ) . '…';
-		$data->license = 'GPL-2.0-or-later';
-		$data->keywords = $package->readme_tags ?? [];
+		$data->license = $package->license ?? 'GPL-2.0-or-later';
+		$data->keywords = $package->readme_tags ? array_values( $package->readme_tags ) : [];
 		$data->sections = $package->sections;
 
 		// Parse link back out of author string.
 		$data->authors[] = [
 			'name' => $package->author,
-			// todo: url
+			'url' => $package->author_uri ??  '',
 		];
-		foreach ( $package->contributors as $contributor ) {
-			$data->authors[] = [
-				'name' => $contributor['display_name'],
-				'url' => $contributor['profile'],
-			];
-		}
+		//foreach ( $package->contributors as $contributor ) {
+		//	$data->authors[] = [
+		//		'name' => $contributor['display_name'],
+		//		'url' => $contributor['profile'],
+		//	];
+		//}
 
 		// Releases.
 		$data->releases = $this->get_release_data( $did, $package );
@@ -146,7 +147,7 @@ class Provider implements ProviderInterface {
 		$needs_auth = $package->is_private;
 		$releases = [];
 		$images = [];
-		$versions = $package->release_asset ? $package->release_assets : $package->rollback;
+		$versions = $package->release_asset ? $package->release_assets : $package->tags;
 
 		// Banners and icons.
 		$other_assets = [
@@ -191,7 +192,7 @@ class Provider implements ProviderInterface {
 			$artifact_metadata = get_artifact_metadata( $did, $artifact_url );
 			$release['artifacts']['package'][] = [
 				'url' => $artifact_url,
-				'content-type' => 'application/zip',
+				'content-type' => $package->release_asset ? 'application/octet-stream' : 'application/zip',
 				'signature' => $artifact_metadata['signature'] ?? null,
 				'checksum' => $artifact_metadata['sha256'] ?? null,
 			];

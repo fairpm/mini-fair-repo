@@ -3,6 +3,7 @@
 namespace MiniFAIR\PLC;
 
 use Exception;
+use MiniFAIR;
 use MiniFAIR\API;
 use MiniFAIR\Keys;
 use MiniFAIR\Keys\Key;
@@ -226,11 +227,7 @@ class DID {
 	 */
 	public function fetch_last_op() : Operation {
 		$url = sprintf( '%s/%s/log/last', static::DIRECTORY_API, $this->id );
-		$response = wp_remote_get( $url, [
-			'headers' => [
-				'Accept' => 'application/did+ld+json',
-			],
-		] );
+		$response = MiniFAIR\get_remote_url( $url );
 		if ( is_wp_error( $response ) ) {
 			throw new Exception( 'Error fetching last op: ' . $response->get_error_message() );
 		}
@@ -261,11 +258,7 @@ class DID {
 	 */
 	public function fetch_audit_log() {
 		$url = sprintf( '%s/%s/log/audit', static::DIRECTORY_API, $this->id );
-		$response = wp_remote_get( $url, [
-			'headers' => [
-				'Accept' => 'application/did+ld+json',
-			],
-		] );
+		$response = MiniFAIR\get_remote_url( $url );
 		if ( is_wp_error( $response ) ) {
 			return false;
 		}
@@ -278,26 +271,12 @@ class DID {
 		return $data;
 	}
 
-	public function refresh() {
-		// $url = sprintf( '%s/%s', static::DIRECTORY_API, $this->id );
-		// $response = wp_remote_get( $url, [
-		// 	'headers' => [
-		// 		'Accept' => 'application/did+ld+json',
-		// 	],
-		// ] );
-		// if ( is_wp_error( $response ) ) {
-		// 	return false;
-		// }
-	}
-
+	/**
+	 * @return bool|WP_Error
+	 */
 	public function is_published() {
-		$this->refresh();
 		$url = sprintf( 'https://plc.directory/%s', $this->id );
-		$response = wp_remote_get( $url, [
-			'headers' => [
-				'Accept' => 'application/did+ld+json',
-			],
-		] );
+		$response = MiniFAIR\get_remote_url( $url );
 		if ( is_wp_error( $response ) ) {
 			return false;
 		}
