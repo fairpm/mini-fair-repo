@@ -166,7 +166,7 @@ class ECKey implements Key {
 
 		$curve = match ( substr( $decoded, 0, 2 ) ) {
 			PREFIX_CURVE_P256_PRIVATE => CURVE_P256,
-			PREFIX_CURVE_K256_PRIVATE = CURVE_K256,
+			PREFIX_CURVE_K256_PRIVATE => CURVE_K256,
 
 			// todo: Legacy, remove this later.
 			PREFIX_CURVE_P256 => CURVE_P256,
