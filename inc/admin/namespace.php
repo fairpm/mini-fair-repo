@@ -339,10 +339,11 @@ function render_edit_page( WP_Post $post ) {
 				<label for="recovery"><?php esc_html_e( 'Verification Public Keys', 'minifair' ); ?></label>
 			</th>
 			<td>
-				<p class="description"><?php esc_html_e( 'Verification keys are used for package signing.', 'minifair' ); ?></p>
+				<p class="description"><?php esc_html_e( 'Verification keys are used for package signing. Your newest (last) key is used for signing, but older keys are still used for verification. Revoking any key will invalidate any older packages which may be cached, so should only be done after some time (such as a week) has passed.', 'minifair' ); ?></p>
 				<ol>
 					<?php
 					$verification_keys = $did->get_verification_keys();
+					$last = end( $verification_keys );
 					foreach ( $verification_keys as $key ) : ?>
 						<?php
 						$public = $key->encode_public();
@@ -353,6 +354,9 @@ function render_edit_page( WP_Post $post ) {
 							<code><?= esc_html( $public ); ?></code>
 							<?php if ( $key instanceof Keys\ECKey ) : ?>
 								<p><small><em>(Key is using outdated algorithm and should be replaced.)</em></small></p>
+							<?php endif; ?>
+							<?php if ( $key === $last ): ?>
+								<p><small><strong>Current</strong></small></p>
 							<?php endif; ?>
 
 							<form action="" method="post">
