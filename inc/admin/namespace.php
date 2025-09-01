@@ -4,6 +4,7 @@ namespace MiniFAIR\Admin;
 
 use Exception;
 use MiniFAIR;
+use MiniFAIR\Keys;
 use MiniFAIR\PLC\DID;
 use WP_Post;
 
@@ -346,6 +347,10 @@ function render_edit_page( WP_Post $post ) {
 						<li>
 							<code>fair_<?= esc_html( $id ); ?></code>:
 							<code><?= esc_html( $public ); ?></code>
+							<?php if ( $key instanceof Keys\ECKey ) : ?>
+								<p><small><em>(Key is using outdated algorithm and should be replaced.)</em></small></p>
+							<?php endif; ?>
+
 							<form action="" method="post">
 								<?php wp_nonce_field( NONCE_PREFIX . ACTION_KEY_REVOKE ); ?>
 								<input type="hidden" name="post" value="<?= esc_attr( $post->ID ); ?>" />
