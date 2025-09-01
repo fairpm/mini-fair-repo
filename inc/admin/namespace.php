@@ -2,19 +2,25 @@
 
 namespace MiniFAIR\Admin;
 
+use Exception;
 use MiniFAIR;
-use MiniFAIR\PLC\DID;
 use MiniFAIR\Keys;
+use MiniFAIR\PLC\DID;
 use WP_Post;
 
-const NONCE_CREATE_ACTION = 'minifair_create';
-const NONCE_SYNC_ACTION = 'minifair_sync';
+const ACTION_CREATE = 'create';
+const ACTION_KEY_ADD = 'key_add';
+const ACTION_KEY_REVOKE = 'key_revoke';
+const ACTION_SYNC = 'sync';
+const NONCE_PREFIX = 'minifair_';
 const PAGE_SLUG = 'minifair';
 
 function bootstrap() {
 	// Register the admin menu and page before the PLC DID post type is registered.
 	add_action( 'admin_menu', __NAMESPACE__ . '\\add_admin_menu', 0 );
-	add_action( 'post_action_sync', __NAMESPACE__ . '\\maybe_on_sync' );
+	add_action( 'post_action_' . ACTION_KEY_ADD, __NAMESPACE__ . '\\handle_action', 10, 1 );
+	add_action( 'post_action_' . ACTION_KEY_REVOKE, __NAMESPACE__ . '\\handle_action', 10, 1 );
+	add_action( 'post_action_' . ACTION_SYNC, __NAMESPACE__ . '\\handle_action', 10, 1 );
 
 	// Hijack the post-new.php page to render our own form.
 	add_action( 'replace_editor', function ( $res, WP_Post $post ) {
@@ -166,7 +172,7 @@ function render_new_page( WP_Post $post ) {
 			wp_die( __( 'Invalid action.', 'minifair' ) );
 		}
 
-		check_admin_referer( NONCE_CREATE_ACTION );
+		check_admin_referer( NONCE_PREFIX . ACTION_CREATE );
 
 		// Handle the form submission to create a new PLC DID.
 		$did = DID::create();
@@ -183,7 +189,7 @@ function render_new_page( WP_Post $post ) {
 	<p><?php esc_html_e( 'PLC DIDs are permanent, and publicly available in the PLC directory.', 'minifair' ) ?></p>
 
 	<form action="" method="post">
-		<?php wp_nonce_field( NONCE_CREATE_ACTION ) ?>
+		<?php wp_nonce_field( NONCE_PREFIX . ACTION_CREATE ) ?>
 		<input type="hidden" name="post" value="<?php echo esc_attr( $post->ID ); ?>" />
 		<input type="hidden" name="action" value="create" />
 
@@ -208,21 +214,88 @@ function render_new_page( WP_Post $post ) {
 	<?php
 }
 
-function maybe_on_sync( int $post_id ) {
+function handle_action( int $post_id ) {
 	$post = get_post( $post_id );
 	if ( ! $post || $post->post_type !== DID::POST_TYPE ) {
 		return;
 	}
 
-	// Handle the form submission to sync the PLC DID with the PLC Directory.
-	check_admin_referer( NONCE_SYNC_ACTION );
+	$action = $_REQUEST['action'] ?? '';
+	if ( empty( $action ) ) {
+		// This should never occur, since we're hooked into specific actions above.
+		wp_die( __( 'No action specified.', 'minifair' ), '', [ 'response' => 400 ] );
+	}
+
+	check_admin_referer( NONCE_PREFIX . $action );
 
 	$did = DID::from_post( $post );
+	switch ( $action ) {
+		case ACTION_KEY_ADD:
+			on_add_key( $did );
+			break;
+		case ACTION_KEY_REVOKE:
+			on_revoke_key( $did );
+			break;
+		case ACTION_SYNC:
+			on_sync( $did );
+			break;
+		default:
+			wp_die( __( 'Invalid action.', 'minifair' ), '', [ 'response' => 400 ] );
+	}
+}
+
+function on_sync( DID $did ) {
+	check_admin_referer( NONCE_PREFIX . ACTION_SYNC );
+
 	try {
 		$did->update();
 		wp_redirect( get_edit_post_link( $did->get_internal_post_id(), 'raw' ) );
 		exit;
 	} catch ( \Exception $e ) {
+		wp_die( $e->getMessage(), __( 'Error Syncing PLC DID', 'minifair' ), [ 'response' => 500 ] );
+	}
+}
+
+function on_add_key( DID $did ) {
+	// Handle adding a new verification key.
+	$did->generate_verification_key();
+
+	try {
+		$did->update();
+		$did->save();
+		wp_redirect( get_edit_post_link( $did->get_internal_post_id(), 'raw' ) );
+		exit;
+	} catch ( \Exception $e ) {
+		var_dump( $e );
+		wp_die( $e->getMessage(), __( 'Error Syncing PLC DID', 'minifair' ), [ 'response' => 500 ] );
+	}
+}
+
+function on_revoke_key( DID $did ) {
+	// Handle revoking an existing verification key.
+	$key_id = $_POST['key_id'] ?? '';
+	if ( empty( $key_id ) ) {
+		wp_die( __( 'No key ID specified.', 'minifair' ), '', [ 'response' => 400 ] );
+	}
+
+	// Find corresponding private key.
+	$keys = $did->get_verification_keys();
+	$key = array_find( $keys, fn ( $k ) => $k->encode_public() === $key_id );
+	if ( empty( $key ) ) {
+		wp_die( __( 'Invalid key ID.', 'minifair' ), '', [ 'response' => 400 ] );
+	}
+
+	if ( ! $did->invalidate_verification_key( $key ) ) {
+		wp_die( __( 'Failed to revoke key.', 'minifair' ), '', [ 'response' => 500 ] );
+	}
+
+	try {
+		$did->update();
+		$did->save();
+		wp_redirect( get_edit_post_link( $did->get_internal_post_id(), 'raw' ) );
+		exit;
+	} catch ( Exception $e ) {
+		var_dump( $e );
 		wp_die( $e->getMessage(), __( 'Error Syncing PLC DID', 'minifair' ), [ 'response' => 500 ] );
 	}
 }
@@ -255,7 +328,7 @@ function render_edit_page( WP_Post $post ) {
 			<td>
 				<ol>
 					<?php foreach ( $did->get_rotation_keys() as $key ) : ?>
-						<li><code><?php echo esc_html( Keys\encode_public_key( $key, Keys\CURVE_K256 ) ); ?></code></li>
+						<li><code><?php echo esc_html( $key->encode_public() ); ?></code></li>
 					<?php endforeach; ?>
 				</ol>
 				<p class="description"><?php esc_html_e( 'Rotation keys are used to manage the DID itself.', 'minifair' ); ?></p>
@@ -266,12 +339,56 @@ function render_edit_page( WP_Post $post ) {
 				<label for="recovery"><?php esc_html_e( 'Verification Public Keys', 'minifair' ); ?></label>
 			</th>
 			<td>
+				<p class="description"><?php esc_html_e( 'Verification keys are used for package signing. Your newest (last) key is used for signing, but older keys are still used for verification. Revoking any key will invalidate any older packages which may be cached, so should only be done after some time (such as a week) has passed.', 'minifair' ); ?></p>
 				<ol>
-					<?php foreach ( $did->get_verification_keys() as $key ) : ?>
-						<li><code><?php echo esc_html( Keys\encode_public_key( $key, Keys\CURVE_K256 ) ); ?></code></li>
+					<?php
+					$verification_keys = $did->get_verification_keys();
+					$last = end( $verification_keys );
+					foreach ( $verification_keys as $key ) : ?>
+						<?php
+						$public = $key->encode_public();
+						$id = substr( hash( 'sha256', $public ), 0, 6 );
+						?>
+						<li>
+							<code>fair_<?= esc_html( $id ); ?></code>:
+							<code><?= esc_html( $public ); ?></code>
+							<?php if ( $key instanceof Keys\ECKey ) : ?>
+								<p><small><em>(Key is using outdated algorithm and should be replaced.)</em></small></p>
+							<?php endif; ?>
+							<?php if ( $key === $last ): ?>
+								<p><small><strong>Current</strong></small></p>
+							<?php endif; ?>
+
+							<form action="" method="post">
+								<?php wp_nonce_field( NONCE_PREFIX . ACTION_KEY_REVOKE ); ?>
+								<input type="hidden" name="post" value="<?= esc_attr( $post->ID ); ?>" />
+								<input type="hidden" name="action" value="<?= esc_attr( ACTION_KEY_REVOKE ); ?>" />
+								<input type="hidden" name="key_id" value="<?= esc_attr( $key->encode_public() ); ?>" />
+								<?php
+								$disabled = count( $verification_keys ) === 1
+									? [
+										'disabled' => 'disabled',
+										'title' => __( 'You must have at least one verification key.', 'minifair' ),
+									]
+									: [];
+
+								submit_button(
+									__( 'Revoke', 'minifair' ),
+									'',
+									'revoke_verification_key',
+									true,
+									$disabled
+								); ?>
+							</form>
+						</li>
 					<?php endforeach; ?>
 				</ol>
-				<p class="description"><?php esc_html_e( 'Verification keys are used for package signing.', 'minifair' ); ?></p>
+				<form action="" method="post">
+					<?php wp_nonce_field( NONCE_PREFIX . ACTION_KEY_ADD ); ?>
+					<input type="hidden" name="post" value="<?= esc_attr( $post->ID ); ?>" />
+					<input type="hidden" name="action" value="<?= esc_attr( ACTION_KEY_ADD ); ?>" />
+					<?php submit_button( __( 'Add new key', 'minifair' ), '', 'add_verification_key' ); ?>
+				</form>
 			</td>
 		</tr>
 		<tr>
@@ -296,10 +413,26 @@ function render_edit_page( WP_Post $post ) {
 			</th>
 			<td>
 				<p><?php esc_html_e( 'If the service endpoint or keys have changed, you can resync to the PLC Directory.', 'minifair' ); ?></p>
+				<details>
+					<summary><?php esc_html_e( 'Expected changes', 'minifair' ); ?></summary>
+					<?php
+					$current = $remote;
+					unset( $current['@context'] );
+					$diff = wp_text_diff(
+						json_encode( $current, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES ),
+						json_encode( $did->get_expected_document(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES )
+					);
+					if ( empty( $diff ) ) {
+						echo '<p class="description">' . esc_html__( 'No changes detected. The PLC Directory is already up to date.', 'minifair' ) . '</p>';
+					} else {
+						echo '<div class="diff">' . $diff . '</div>';
+					}
+					?>
+				</details>
 				<form action="" method="post">
-					<?php wp_nonce_field( NONCE_SYNC_ACTION ); ?>
+					<?php wp_nonce_field( NONCE_PREFIX . ACTION_SYNC ); ?>
 					<input type="hidden" name="post" value="<?php echo esc_attr( $post->ID ); ?>" />
-					<input type="hidden" name="action" value="sync" />
+					<input type="hidden" name="action" value="<?= esc_attr( ACTION_SYNC ) ?>" />
 					<?php submit_button( __( 'Sync to PLC Directory', 'minifair' ), 'primary', 'update_did' ); ?>
 				</form>
 			</td>

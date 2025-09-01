@@ -104,10 +104,21 @@ function get_artifact_metadata( DID $did, $url ) {
  * @return array|WP_Error
  */
 function generate_artifact_metadata( DID $did, $url ) {
-	$signing_key = $did->get_verification_keys()[0] ?? null;
-	if ( ! $signing_key ) {
-		var_dump( 'No signing key found for DID' );
-		return;
+	$keys = $did->get_verification_keys();
+	if ( empty( $keys ) ) {
+		return new WP_Error(
+			'minifair.generate_artifact_metadata.missing_keys',
+			__( 'No verification keys found for DID', 'minifair' )
+		);
+	}
+
+	// todo: make active key selectable
+	$signing_key = end( $keys );
+	if ( empty( $signing_key ) ) {
+		return new WP_Error(
+			'minifair.generate_artifact_metadata.missing_signing_key',
+			__( 'No signing key found for DID', 'minifair' )
+		);
 	}
 
 	$artifact_id = sprintf( '%s:%s', $did->id, substr( sha1( $url ), 0, 8 ) );
