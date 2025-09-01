@@ -1,4 +1,19 @@
 {
+    "name": "fairpm/mini-fair-repo",
+    "description": "Transform your WP site into a FAIR Package Management Repository",
+    "type": "wordpress-plugin",
+    "license": "GPL-2.0-or-later",
+    "version": "0.1.0",
+    "authors": [
+        {
+            "name": "FAIR Contributors"
+        }
+    ],
+    "homepage": "https://github.com/fairpm/mini-fair-repo",
+    "support": {
+        "issues": "https://github.com/fairpm/mini-fair-repo/issues",
+        "source": "https://github.com/fairpm/mini-fair-repo"
+    },
     "require": {
         "yocto/yoclib-multibase": "^1.2",
         "simplito/elliptic-php": "^1.0",
