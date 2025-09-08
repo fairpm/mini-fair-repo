@@ -95,6 +95,14 @@ class Provider implements ProviderInterface {
 		$data->slug = $package->slug;
 		$data->filename = $package->file;
 		$data->description = substr( strip_tags( trim( $package->sections['description'] ) ), 0, 139 ) . '…';
+
+		// Parse security data.
+		$data->security = [];
+		if ( ! empty( $package->security ) ) {
+			$security_key = is_email( $package->security ) ? 'email' : 'uri';
+			$data->security[][ $security_key ] = $package->security;
+		}
+
 		$data->license = $package->license ?? 'GPL-2.0-or-later';
 		$data->keywords = $package->readme_tags ? array_values( $package->readme_tags ) : [];
 		$data->sections = $package->sections;
