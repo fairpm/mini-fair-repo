@@ -100,7 +100,7 @@ class Provider implements ProviderInterface {
 		$data->security = [];
 		if ( ! empty( $package->security ) ) {
 			$security_key = is_email( $package->security ) ? 'email' : 'uri';
-			$data->security[][ $security_key ] = $package->security ?? '';
+			$data->security[][ $security_key ] = $package->security;
 		}
 
 		$data->license = $package->license ?? 'GPL-2.0-or-later';
