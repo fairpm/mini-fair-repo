@@ -66,6 +66,29 @@ class ECKey implements Key {
 	}
 
 	/**
+	 * Convert a key to an incorrectly-encoded key string.
+	 *
+	 * Used only for revocation.
+	 *
+	 * @throws Exception If the curve is not supported.
+	 * @return string The multibase private key string (starts with z).
+	 */
+	public function encode_private_legacy_do_not_use_or_you_will_be_fired() : string {
+		if ( ! $this->is_private() ) {
+			throw new Exception( 'Cannot encode private key for a public key' );
+		}
+
+		$priv = $this->keypair->getPrivate( 'hex' );
+		$prefix = match ( $this->curve ) {
+			CURVE_K256 => bin2hex( PREFIX_CURVE_K256 ),
+			CURVE_P256 => bin2hex( PREFIX_CURVE_P256 ),
+			default => throw new Exception( 'Unsupported curve' ),
+		};
+		$encoded = Multibase::encode( Multibase::BASE58BTC, hex2bin( $prefix . $priv ));
+		return $encoded;
+	}
+
+	/**
 	 * Convert a signature to compact (IEEE-P1363) representation.
 	 *
 	 * (Equivalent to secp256k1_ecdsa_sign_compact().)

@@ -67,15 +67,8 @@ class DID {
 
 		if ( ! in_array( $encoded, $this->verification_keys, true ) ) {
 			// Check for legacy-encoded keys too.
-			if ( str_starts_with( $encoded, Keys\PREFIX_CURVE_K256_PRIVATE ) ) {
-				$legacy_encoded = Keys\PREFIX_CURVE_K256 . substr( $encoded, strlen( Keys\PREFIX_CURVE_K256_PRIVATE ) );
-				if ( ! in_array( $legacy_encoded, $this->verification_keys, true ) ) {
-					return false;
-				}
-				$encoded = $legacy_encoded;
-			}
-			elseif ( str_starts_with( $encoded, Keys\PREFIX_CURVE_ED25519_PRIVATE ) ) {
-				$legacy_encoded = Keys\PREFIX_CURVE_ED25519 . substr( $encoded, strlen( Keys\PREFIX_CURVE_ED25519_PRIVATE ) );
+			if ( method_exists( $key, 'encode_private_legacy_do_not_use_or_you_will_be_fired' ) ) {
+				$legacy_encoded = $key->encode_private_legacy_do_not_use_or_you_will_be_fired();
 				if ( ! in_array( $legacy_encoded, $this->verification_keys, true ) ) {
 					return false;
 				}
