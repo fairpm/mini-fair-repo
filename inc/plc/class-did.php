@@ -79,7 +79,7 @@ class DID {
 			}
 		}
 
-		$this->verification_keys = array_filter( $this->verification_keys, fn ( $k ) => $k !== $encoded );
+		$this->verification_keys = array_values( array_filter( $this->verification_keys, fn ( $k ) => $k !== $encoded ) );
 		return true;
 	}
 
