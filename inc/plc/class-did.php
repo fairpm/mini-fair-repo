@@ -272,6 +272,7 @@ class DID {
 	 */
 	public function fetch_audit_log() {
 		$url = sprintf( '%s/%s/log/audit', static::DIRECTORY_API, $this->id );
+		wp_cache_delete( CACHE_PREFIX . sha1( $url ) );
 		$response = MiniFAIR\get_remote_url( $url );
 		if ( is_wp_error( $response ) ) {
 			return false;
@@ -290,6 +291,7 @@ class DID {
 	 */
 	public function is_published() {
 		$url = sprintf( 'https://plc.directory/%s', $this->id );
+		wp_cache_delete( CACHE_PREFIX . sha1( $url ) );
 		$response = MiniFAIR\get_remote_url( $url );
 		if ( is_wp_error( $response ) ) {
 			return false;
