@@ -567,7 +567,7 @@ function render_edit_page( WP_Post $post ) {
 			</th>
 			<td>
 				<p><?php esc_html_e( "Need to move this DID to a different directory? Export the DID's data here.", 'minifair' ); ?></p>
-				<p><?php echo wp_kses_post( __( "<strong>Warning:</strong> This export contains the <strong>private key material</strong> to control this DID. Ensure you keep it safe.", 'minifair' ) ); ?></p>
+				<p><?php echo wp_kses_post( __( "<strong>Warning:</strong> This export contains the <strong>private key material</strong> to control this DID. Ensure you keep it safe, as DIDs are <strong>unrecoverable</strong> if lost.", 'minifair' ) ); ?></p>
 				<form action="" method="post">
 					<?php wp_nonce_field( NONCE_PREFIX . ACTION_EXPORT ); ?>
 					<input type="hidden" name="post" value="<?php echo esc_attr( $post->ID ); ?>" />

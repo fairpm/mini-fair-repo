@@ -307,6 +307,7 @@ class DID {
 	public function export() : stdClass {
 		return (object) [
 			'@context' => 'https://fair.pm/did-export',
+			'_warning' => 'WARNING: This file contains your private keys for your DID. Do not share it publicly, as it will lead to your DID being PERMANENTLY COMPROMISED and UNRECOVERABLE.',
 			'id' => $this->id,
 			'rotation' => array_values( $this->rotation_keys ),
 			'verification' => array_values( $this->verification_keys ),
