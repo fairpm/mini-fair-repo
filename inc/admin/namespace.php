@@ -126,9 +126,19 @@ function render_settings_page() {
 	<?php
 }
 
+/**
+ * Fetch the raw data for the DID document.
+ *
+ * @internal This is intentionally uncached, as need the latest data for the DID.
+ * @return stdClass|WP_Error
+ */
 function fetch_did( DID $did ) {
 	$url = DID::DIRECTORY_API . '/' . $did->id;
-	$res = MiniFAIR\get_remote_url( $url );
+	$res = wp_remote_get( $url, [
+		'headers' => [
+			'Accept' => 'application/did+ld+json',
+		]
+	] );
 	if ( is_wp_error( $res ) ) {
 		return $res;
 	}
