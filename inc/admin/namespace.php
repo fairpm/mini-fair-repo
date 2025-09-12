@@ -9,6 +9,8 @@ use MiniFAIR\PLC\DID;
 use WP_Post;
 
 const ACTION_CREATE = 'create';
+const ACTION_EXPORT = 'export';
+const ACTION_IMPORT = 'import';
 const ACTION_KEY_ADD = 'key_add';
 const ACTION_KEY_REVOKE = 'key_revoke';
 const ACTION_SYNC = 'sync';
@@ -18,6 +20,7 @@ const PAGE_SLUG = 'minifair';
 function bootstrap() {
 	// Register the admin menu and page before the PLC DID post type is registered.
 	add_action( 'admin_menu', __NAMESPACE__ . '\\add_admin_menu', 0 );
+	add_action( 'post_action_' . ACTION_EXPORT, __NAMESPACE__ . '\\handle_action', 10, 1 );
 	add_action( 'post_action_' . ACTION_KEY_ADD, __NAMESPACE__ . '\\handle_action', 10, 1 );
 	add_action( 'post_action_' . ACTION_KEY_REVOKE, __NAMESPACE__ . '\\handle_action', 10, 1 );
 	add_action( 'post_action_' . ACTION_SYNC, __NAMESPACE__ . '\\handle_action', 10, 1 );
@@ -50,6 +53,15 @@ function add_admin_menu() {
 }
 
 function load_settings_page() {
+	if ( ! isset( $_POST['action'] ) ) {
+		return;
+	}
+
+	switch ( $_POST['action'] ) {
+		case ACTION_IMPORT:
+			on_import();
+			break;
+	}
 }
 
 function render_settings_page() {
@@ -121,6 +133,8 @@ function render_settings_page() {
 			</table>
 		<?php endif; ?>
 
+		<hr />
+
 		<h2><?php esc_html_e( 'Publish a New Package', 'minifair' ); ?></h2>
 		<p><?php esc_html_e( 'The first step in publishing a new package is to create a DID for it. This will act as the permanent, globally-unique ID for your package.', 'minifair' ); ?></p>
 		<p>
@@ -128,8 +142,69 @@ function render_settings_page() {
 				<?php esc_html_e( 'Create New PLC DID…', 'minifair' ); ?>
 			</a>
 		</p>
+
+		<h2><?php esc_html_e( 'Import an existing DID', 'minifair' ); ?></h2>
+		<p><?php esc_html_e( 'If you have an existing DID that you want to import from another Mini FAIR site, you can do so here.', 'minifair' ); ?></p>
+		<p><?= wp_kses_post( __( '<strong>Note:</strong> Registering a single DID with multiple sites may break your DID.', 'minifair' ) ); ?></p>
+		<form action="" method="post" enctype="multipart/form-data">
+			<p>
+				<input
+					type="file"
+					id="did_json"
+					name="did_json"
+				/>
+			</p>
+			<?php wp_nonce_field( NONCE_PREFIX . ACTION_IMPORT ); ?>
+			<input type="hidden" name="action" value="<?= esc_attr( ACTION_IMPORT ) ?>" />
+			<?php submit_button( __( 'Import DID', 'minifair' ), 'primary', 'import_did' ); ?>
 	</div>
 	<?php
+}
+
+function on_import() {
+	check_admin_referer( NONCE_PREFIX . ACTION_IMPORT );
+
+	// Check user permissions.
+	if ( ! current_user_can( 'manage_options' ) ) {
+		wp_die( __( 'You do not have sufficient permissions to access this page.', 'minifair' ) );
+	}
+
+	// Handle the form submission to import a DID.
+	$did_json = $_FILES['did_json'] ?? null;
+	if ( empty( $did_json ) || empty( $did_json['tmp_name'] ) ) {
+		wp_admin_notice( __( 'No DID JSON file uploaded.', 'minifair' ) );
+		return;
+	}
+
+	$data = json_decode( file_get_contents( $did_json['tmp_name'] ), true );
+	if ( json_last_error() !== JSON_ERROR_NONE ) {
+		wp_admin_notice(
+			sprintf(
+				__( 'Could not parse DID JSON: %s', 'minifair' ),
+				json_last_error_msg()
+			),
+			[
+				'type' => 'error',
+			]
+		);
+		return;
+	}
+
+	try {
+		$did = DID::import( $data );
+		wp_redirect( get_edit_post_link( $did->get_internal_post_id(), 'raw' ) );
+		exit;
+	} catch ( Exception $e ) {
+		wp_admin_notice(
+			sprintf(
+				__( 'Could not import DID: %s', 'minifair' ),
+				$e->getMessage()
+			),
+			[
+				'type' => 'error',
+			]
+		);
+	}
 }
 
 function fetch_did( DID $did ) {
@@ -250,6 +325,9 @@ function handle_action( int $post_id ) {
 		case ACTION_KEY_REVOKE:
 			on_revoke_key( $did );
 			break;
+		case ACTION_EXPORT:
+			on_export( $did );
+			break;
 		case ACTION_SYNC:
 			on_sync( $did );
 			break;
@@ -312,6 +390,38 @@ function on_revoke_key( DID $did ) {
 		var_dump( $e );
 		wp_die( $e->getMessage(), __( 'Error Syncing PLC DID', 'minifair' ), [ 'response' => 500 ] );
 	}
+}
+
+/**
+ * Handle an export request for a DID.
+ *
+ * @return void Handles the request, then exits.
+ */
+function on_export( DID $did ) : void {
+	// Handle exporting the DID document.
+	check_admin_referer( NONCE_PREFIX . ACTION_EXPORT );
+
+	// Double-check the permissions.
+	if ( ! current_user_can( 'manage_options' ) ) {
+		wp_die( __( 'You do not have sufficient permissions to perform this action.', 'minifair' ), '', [ 'response' => 403 ] );
+	}
+
+	$document = $did->export();
+	if ( ! $document ) {
+		wp_die( __( 'Failed to export DID document.', 'minifair' ), '', [ 'response' => 500 ] );
+	}
+
+	// Send the document to the browser for download.
+	header( 'Content-Type: application/json' );
+	header(
+		sprintf(
+			'Content-Disposition: attachment; filename="did-%s.json"',
+			str_replace( 'did:plc:', '', $did->id )
+		)
+	);
+	header( 'Cache-Control: no-store, no-cache, must-revalidate, max-age=0' );
+	echo json_encode( $document, JSON_PRETTY_PRINT );
+	exit;
 }
 
 function render_edit_page( WP_Post $post ) {
@@ -448,6 +558,21 @@ function render_edit_page( WP_Post $post ) {
 					<input type="hidden" name="post" value="<?php echo esc_attr( $post->ID ); ?>" />
 					<input type="hidden" name="action" value="<?= esc_attr( ACTION_SYNC ) ?>" />
 					<?php submit_button( __( 'Sync to PLC Directory', 'minifair' ), 'primary', 'update_did' ); ?>
+				</form>
+			</td>
+		</tr>
+		<tr>
+			<th scope="row">
+				<?php esc_html_e( 'Export', 'minifair' ) ?>
+			</th>
+			<td>
+				<p><?php esc_html_e( "Need to move this DID to a different directory? Export the DID's data here.", 'minifair' ); ?></p>
+				<p><?php echo wp_kses_post( __( "<strong>Warning:</strong> This export contains the <strong>private key material</strong> to control this DID. Ensure you keep it safe.", 'minifair' ) ); ?></p>
+				<form action="" method="post">
+					<?php wp_nonce_field( NONCE_PREFIX . ACTION_EXPORT ); ?>
+					<input type="hidden" name="post" value="<?php echo esc_attr( $post->ID ); ?>" />
+					<input type="hidden" name="action" value="<?= esc_attr( ACTION_EXPORT ) ?>" />
+					<?php submit_button( __( 'Export DID Document', 'minifair' ), 'primary', 'export_did' ); ?>
 				</form>
 			</td>
 		</tr>

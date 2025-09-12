@@ -7,6 +7,7 @@ use MiniFAIR;
 use MiniFAIR\API;
 use MiniFAIR\Keys;
 use MiniFAIR\Keys\Key;
+use stdClass;
 use WP_Post;
 
 class DID {
@@ -302,6 +303,36 @@ class DID {
 	 * Has this DID been registered?
 	 */
 	protected bool $created = false;
+
+	public function export() : stdClass {
+		return (object) [
+			'@context' => 'https://fair.pm/did-export',
+			'id' => $this->id,
+			'rotation' => array_values( $this->rotation_keys ),
+			'verification' => array_values( $this->verification_keys ),
+		];
+	}
+
+	public static function import( stdClass $data ) {
+		if ( empty( $data->{'@context'} ) || $data->{'@context'} !== 'https://fair.pm/did-export' ) {
+			throw new Exception( 'Invalid DID export data.', 400 );
+		}
+
+		$did = new static();
+		$did->id = $data->id;
+
+		// Check that we can decode the keys we're passed.
+		foreach ( $data->rotation as $key ) {
+			Keys\decode_private_key( $key );
+			$did->rotation_keys[] = $key;
+		}
+		foreach ( $data->verification as $key ) {
+			Keys\decode_private_key( $key );
+			$did->verification_keys[] = $key;
+		}
+
+		return $did;
+	}
 
 	public static function get( string $id ) {
 		$did = new self();
