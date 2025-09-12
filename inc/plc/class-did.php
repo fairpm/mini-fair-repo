@@ -2,6 +2,8 @@
 
 namespace MiniFAIR\PLC;
 
+use const MiniFAIR\CACHE_PREFIX;
+
 use Exception;
 use MiniFAIR;
 use MiniFAIR\API;
@@ -238,6 +240,7 @@ class DID {
 	 */
 	public function fetch_last_op() : Operation {
 		$url = sprintf( '%s/%s/log/last', static::DIRECTORY_API, $this->id );
+		wp_cache_delete( CACHE_PREFIX . sha1( $url ) );
 		$response = MiniFAIR\get_remote_url( $url );
 		if ( is_wp_error( $response ) ) {
 			throw new Exception( 'Error fetching last op: ' . $response->get_error_message() );
