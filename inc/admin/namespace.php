@@ -143,6 +143,10 @@ function fetch_did( DID $did ) {
 }
 
 function render_editor() {
+	if ( isset( $_POST['action'] ) && $_POST['action'] === ACTION_CREATE ) {
+		on_create();
+	}
+
 	require_once ABSPATH . 'wp-admin/admin-header.php';
 
 	echo '<div class="wrap">';
@@ -161,27 +165,37 @@ function render_editor() {
 	}
 }
 
-function render_new_page( WP_Post $post ) {
+function on_create() {
+	check_admin_referer( NONCE_PREFIX . ACTION_CREATE );
+
 	// Check user permissions.
 	if ( ! current_user_can( 'manage_options' ) ) {
 		wp_die( __( 'You do not have sufficient permissions to access this page.', 'minifair' ) );
 	}
 
-	if ( isset( $_POST['action'] ) ) {
-		if ( $_POST['action'] !== 'create' ) {
-			wp_die( __( 'Invalid action.', 'minifair' ) );
-		}
+	// Handle the form submission to create a new PLC DID.
+	$did = DID::create();
+	if ( is_wp_error( $did ) ) {
+		wp_admin_notice(
+			sprintf(
+				__( 'Could not create DID: %s', 'minifair' ),
+				$did->get_error_message()
+			),
+			[
+				'type'               => 'error',
+				'additional_classes' => [ 'notice-alt' ],
+			]
+		);
+	} else {
+		wp_redirect( get_edit_post_link( $did->get_internal_post_id(), 'raw' ) );
+		exit;
+	}
+}
 
-		check_admin_referer( NONCE_PREFIX . ACTION_CREATE );
-
-		// Handle the form submission to create a new PLC DID.
-		$did = DID::create();
-		if ( is_wp_error( $did ) ) {
-			echo '<div class="error"><p>' . esc_html( $did->get_error_message() ) . '</p></div>';
-		} else {
-			wp_redirect( get_edit_post_link( $did->get_internal_post_id(), 'raw' ) );
-			exit;
-		}
+function render_new_page( WP_Post $post ) {
+	// Check user permissions.
+	if ( ! current_user_can( 'manage_options' ) ) {
+		wp_die( __( 'You do not have sufficient permissions to access this page.', 'minifair' ) );
 	}
 
 	?>
@@ -191,7 +205,7 @@ function render_new_page( WP_Post $post ) {
 	<form action="" method="post">
 		<?php wp_nonce_field( NONCE_PREFIX . ACTION_CREATE ) ?>
 		<input type="hidden" name="post" value="<?php echo esc_attr( $post->ID ); ?>" />
-		<input type="hidden" name="action" value="create" />
+		<input type="hidden" name="action" value="<?= esc_attr( ACTION_CREATE ) ?>" />
 
 		<table class="form-table">
 			<!-- <tr>
