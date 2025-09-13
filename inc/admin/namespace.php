@@ -128,7 +128,7 @@ function render_settings_page() {
 
 function fetch_did( DID $did ) {
 	$url = DID::DIRECTORY_API . '/' . $did->id;
-	$res = MiniFAIR\get_remote_url( $url );
+	$res = MiniFAIR\get_remote_json( $url );
 	if ( is_wp_error( $res ) ) {
 		return $res;
 	}

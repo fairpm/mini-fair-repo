@@ -172,7 +172,7 @@ class DID {
 	 */
 	public function fetch_last_op() : Operation {
 		$url = sprintf( '%s/%s/log/last', static::DIRECTORY_API, $this->id );
-		$response = MiniFAIR\get_remote_url( $url );
+		$response = MiniFAIR\get_remote_json( $url );
 		if ( is_wp_error( $response ) ) {
 			throw new Exception( 'Error fetching last op: ' . $response->get_error_message() );
 		}
@@ -203,7 +203,7 @@ class DID {
 	 */
 	public function fetch_audit_log() {
 		$url = sprintf( '%s/%s/log/audit', static::DIRECTORY_API, $this->id );
-		$response = MiniFAIR\get_remote_url( $url );
+		$response = MiniFAIR\get_remote_json( $url );
 		if ( is_wp_error( $response ) ) {
 			return false;
 		}
@@ -221,7 +221,7 @@ class DID {
 	 */
 	public function is_published() {
 		$url = sprintf( 'https://plc.directory/%s', $this->id );
-		$response = MiniFAIR\get_remote_url( $url );
+		$response = MiniFAIR\get_remote_json( $url );
 		if ( is_wp_error( $response ) ) {
 			return false;
 		}
