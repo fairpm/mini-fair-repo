@@ -11,6 +11,9 @@ use MiniFAIR\PLC\Util;
 use stdClass;
 use WP_Error;
 
+use const MiniFAIR\CACHE_PREFIX;
+use const MiniFAIR\CACHE_LIFETIME;
+
 function bootstrap() : void {
 	add_action( 'plugins_loaded', __NAMESPACE__ . '\\on_load' );
 }
@@ -113,32 +116,36 @@ function generate_artifact_metadata( DID $did, $url ) {
 	$artifact_id = sprintf( '%s:%s', $did->id, substr( sha1( $url ), 0, 8 ) );
 	$artifact_metadata = get_option( 'minifair_artifact_' . $artifact_id, null );
 
-	// Fetch the artifact.
-	$opt = [
-		'headers' => [
-			'Accept' => 'application/octet-stream;q=1.0, */*;q=0.7',
-		],
-	];
-	if ( ! empty( $artifact_metadata ) && isset( $artifact_metadata['etag'] ) ) {
-		$opt['headers']['If-None-Match'] = $artifact_metadata['etag'];
-	}
+	$cache_key = CACHE_PREFIX . sha1( $url );
+	$cached_artifact = wp_cache_get( $cache_key );
+	if ( ! $cached_artifact ) {
+		// Fetch the artifact.
+		$opt = [
+			'headers' => [
+				'Accept' => 'application/octet-stream;q=1.0, */*;q=0.7',
+			],
+		];
+		if ( ! empty( $artifact_metadata ) && isset( $artifact_metadata['etag'] ) ) {
+			$opt['headers']['If-None-Match'] = $artifact_metadata['etag'];
+		}
 
-	$res = MiniFAIR\get_remote_json( $url, $opt );
-	if ( is_wp_error( $res ) ) {
-		return $res;
-	}
-
-	if ( 304 === $res['response']['code'] ) {
-		// Not modified, no need to update.
-		return $artifact_metadata;
-	}
-	if ( 200 !== $res['response']['code'] ) {
-		// Handle unexpected response code.
-		return new WP_Error(
-			'minifair.artifact.fetch_error',
-			sprintf( __( 'Error fetching artifact: %s', 'minifair' ), $res['response']['code'] ),
-			[ 'status' => $res['response']['code'] ]
-		);
+		$res = MiniFAIR\get_remote_json( $url, $opt );
+		if ( is_wp_error( $res ) ) {
+			return $res;
+		}
+		if ( 304 === $res['response']['code'] ) {
+			// Not modified, no need to update.
+			return $artifact_metadata;
+		}
+		if ( 200 !== $res['response']['code'] ) {
+			// Handle unexpected response code.
+			return new WP_Error(
+				'minifair.artifact.fetch_error',
+				sprintf( __( 'Error fetching artifact: %s', 'minifair' ), $res['response']['code'] ),
+				[ 'status' => $res['response']['code'] ]
+			);
+		}
+		wp_cache_set( $cache_key, $res, '', CACHE_LIFETIME );
 	}
 
 	$next_metadata = [
