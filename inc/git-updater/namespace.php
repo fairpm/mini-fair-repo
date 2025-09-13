@@ -117,8 +117,8 @@ function generate_artifact_metadata( DID $did, $url ) {
 	$artifact_metadata = get_option( 'minifair_artifact_' . $artifact_id, null );
 
 	$cache_key = CACHE_PREFIX . sha1( $url );
-	$cached_artifact = wp_cache_get( $cache_key );
-	if ( ! $cached_artifact ) {
+	$res = wp_cache_get( $cache_key );
+	if ( ! $res ) {
 		// Fetch the artifact.
 		$opt = [
 			'headers' => [
