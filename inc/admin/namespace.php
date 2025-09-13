@@ -126,6 +126,12 @@ function render_settings_page() {
 	<?php
 }
 
+/**
+ * Fetch the raw data for the DID document.
+ *
+ * @internal This is intentionally uncached, as need the latest data for the DID.
+ * @return stdClass|WP_Error
+ */
 function fetch_did( DID $did ) {
 	$url = DID::DIRECTORY_API . '/' . $did->id;
 	$res = MiniFAIR\get_remote_json( $url );

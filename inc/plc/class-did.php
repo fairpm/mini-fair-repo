@@ -167,6 +167,11 @@ class DID {
 	}
 
 	/**
+	 * Fetch the last operation on the DID.
+	 *
+	 * This is used to build the `prev` when we're running updates.
+	 *
+	 * @internal This is intentionally uncached, as need the latest data for the DID.
 	 * @throws Exception
 	 * @return Operation
 	 */
@@ -199,6 +204,9 @@ class DID {
 	}
 
 	/**
+	 * Fetch the audit log for this DID.
+	 *
+	 * @internal This is intentionally uncached, as need the latest data for the DID.
 	 * @return array|WP_Error
 	 */
 	public function fetch_audit_log() {
@@ -217,6 +225,9 @@ class DID {
 	}
 
 	/**
+	 * Check if the DID has been published.
+	 *
+	 * @internal This is intentionally uncached, as need the latest data for the DID.
 	 * @return bool|WP_Error
 	 */
 	public function is_published() {
