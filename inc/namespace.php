@@ -75,7 +75,7 @@ function update_metadata( DID $did, bool $force_regenerate = false ) {
  */
 function get_remote_url( $url, $opt = null ) {
 	$opt = $opt ?? [ 'headers' => [ 'Accept' => 'application/did+ld+json' ] ];
-	$cache_key = CACHE_PREFIX . sha1( $url );
+	$cache_key = CACHE_PREFIX . sha1( $url ) . sha1( serialize( $opt ) );
 	$response = wp_cache_get( $cache_key );
 	if ( ! $response ) {
 		$response = wp_remote_get( $url, $opt );
