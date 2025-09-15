@@ -54,6 +54,21 @@ function get_package_metadata( DID $did ) {
 }
 
 /**
+ * @param DID $did
+ * @param bool $force_regenerate
+ * @return bool|null
+ */
+function update_metadata( DID $did, bool $force_regenerate = false ) {
+	foreach ( get_providers() as $provider ) {
+		if ( $provider->is_authoritative( $did ) ) {
+			return $provider->update_metadata( $did, $force_regenerate );
+		}
+	}
+
+	return null;
+}
+
+/**
  * @param string $url URL.
  * @param array $opt wp_remote_get options.
  * @return array|WP_Error

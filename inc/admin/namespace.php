@@ -11,6 +11,7 @@ use WP_Post;
 const ACTION_CREATE = 'create';
 const ACTION_KEY_ADD = 'key_add';
 const ACTION_KEY_REVOKE = 'key_revoke';
+const ACTION_RESIGN = 'resign';
 const ACTION_SYNC = 'sync';
 const NONCE_PREFIX = 'minifair_';
 const PAGE_SLUG = 'minifair';
@@ -20,6 +21,7 @@ function bootstrap() {
 	add_action( 'admin_menu', __NAMESPACE__ . '\\add_admin_menu', 0 );
 	add_action( 'post_action_' . ACTION_KEY_ADD, __NAMESPACE__ . '\\handle_action', 10, 1 );
 	add_action( 'post_action_' . ACTION_KEY_REVOKE, __NAMESPACE__ . '\\handle_action', 10, 1 );
+	add_action( 'post_action_' . ACTION_RESIGN, __NAMESPACE__ . '\\handle_action', 10, 1 );
 	add_action( 'post_action_' . ACTION_SYNC, __NAMESPACE__ . '\\handle_action', 10, 1 );
 
 	// Hijack the post-new.php page to render our own form.
@@ -250,6 +252,9 @@ function handle_action( int $post_id ) {
 		case ACTION_KEY_REVOKE:
 			on_revoke_key( $did );
 			break;
+		case ACTION_RESIGN:
+			on_resign( $did );
+			break;
 		case ACTION_SYNC:
 			on_sync( $did );
 			break;
@@ -267,6 +272,18 @@ function on_sync( DID $did ) {
 		exit;
 	} catch ( \Exception $e ) {
 		wp_die( $e->getMessage(), __( 'Error Syncing PLC DID', 'minifair' ), [ 'response' => 500 ] );
+	}
+}
+
+function on_resign( DID $did ) {
+	check_admin_referer( NONCE_PREFIX . ACTION_RESIGN );
+
+	try {
+		MiniFAIR\update_metadata( $did, true );
+		wp_redirect( get_edit_post_link( $did->get_internal_post_id(), 'raw' ) );
+		exit;
+	} catch ( \Exception $e ) {
+		wp_die( $e->getMessage(), __( 'Error Regenerating Signatures', 'minifair' ), [ 'response' => 500 ] );
 	}
 }
 
@@ -448,6 +465,20 @@ function render_edit_page( WP_Post $post ) {
 					<input type="hidden" name="post" value="<?php echo esc_attr( $post->ID ); ?>" />
 					<input type="hidden" name="action" value="<?= esc_attr( ACTION_SYNC ) ?>" />
 					<?php submit_button( __( 'Sync to PLC Directory', 'minifair' ), 'primary', 'update_did' ); ?>
+				</form>
+			</td>
+		</tr>
+		<tr>
+			<th scope="row">
+				<?php esc_html_e( 'Regenerate Signatures', 'minifair' ); ?>
+			</th>
+			<td>
+				<p><?php esc_html_e( 'After generating a new key, regenerate artifact signatures to use the new key. Without regeneration, only new artifacts will use the new keys.', 'minifair' ) ?></p>
+				<form action="" method="post">
+					<?php wp_nonce_field( NONCE_PREFIX . ACTION_RESIGN ); ?>
+					<input type="hidden" name="post" value="<?= esc_attr( $post->ID ); ?>" />
+					<input type="hidden" name="action" value="<?= esc_attr( ACTION_RESIGN ); ?>" />
+					<?php submit_button( __( 'Regenerate signatures', 'minifair' ), '', 'regenerate_signatures' ); ?>
 				</form>
 			</td>
 		</tr>

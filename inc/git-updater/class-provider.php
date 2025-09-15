@@ -222,4 +222,45 @@ class Provider implements ProviderInterface {
 		$release = array_find( $releases, fn ( $r ) => $r['version'] === $version );
 		return $release;
 	}
+
+	public function update_metadata( DID $did, bool $force_regenerate = false ) : bool {
+		$package = $this->get_package( $did->id );
+		$repo_api = Singleton::get_instance( 'Fragen\Git_Updater\API\API', $this )->get_repo_api( $package->git, $package );
+
+		$err = $this->update_metadata_from_repo( $did, $repo_api, $force_regenerate );
+		if ( is_wp_error( $err ) ) {
+			var_dump('err!');
+			var_dump( $err );
+			exit;
+			return false;
+		}
+		return true;
+	}
+
+	public function update_metadata_from_repo( DID $did, $repo_api, bool $force_regenerate = false ) : ?WP_Error {
+		$errors = [];
+		$versions = $repo_api->type->release_asset ? $repo_api->type->release_assets : $repo_api->type->tags;
+
+		foreach ( $versions as $tag => $url ) {
+			// This probably wants to be tied to the commit SHA, so that
+			// if tags are changed, we refresh automatically.
+			$data = generate_artifact_metadata( $did, $url, $force_regenerate );
+			if ( is_wp_error( $data ) ) {
+				$errors[] = $data;
+			}
+		}
+
+		if ( empty( $errors ) ) {
+			return null;
+		}
+
+		$err = new WP_Error(
+			'minifair.update_fair_data.error',
+			__( 'Error updating FAIR data for repository.', 'minifair' )
+		);
+		foreach ( $errors as $error ) {
+			$err->merge_from( $error );
+		}
+		return $err;
+	}
 }

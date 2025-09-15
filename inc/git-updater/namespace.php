@@ -99,9 +99,12 @@ function get_artifact_metadata( DID $did, $url ) {
 }
 
 /**
+ * @param DID $did
+ * @param string $url
+ * @param boolean $force_regenerate True to skip cache.
  * @return array|WP_Error
  */
-function generate_artifact_metadata( DID $did, $url ) {
+function generate_artifact_metadata( DID $did, string $url, $force_regenerate = false ) {
 	$keys = $did->get_verification_keys();
 	if ( empty( $keys ) ) {
 		return new WP_Error(
@@ -128,7 +131,7 @@ function generate_artifact_metadata( DID $did, $url ) {
 			'Accept' => 'application/octet-stream;q=1.0, */*;q=0.7',
 		],
 	];
-	if ( ! empty( $artifact_metadata ) && isset( $artifact_metadata['etag'] ) ) {
+	if ( ! $force_regenerate && ! empty( $artifact_metadata ) && isset( $artifact_metadata['etag'] ) ) {
 		$opt['headers']['If-None-Match'] = $artifact_metadata['etag'];
 	}
 
@@ -137,7 +140,7 @@ function generate_artifact_metadata( DID $did, $url ) {
 		return $res;
 	}
 
-	if ( 304 === $res['response']['code'] ) {
+	if ( ! $force_regenerate && 304 === $res['response']['code'] ) {
 		// Not modified, no need to update.
 		return $artifact_metadata;
 	}
