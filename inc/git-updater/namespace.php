@@ -2,10 +2,8 @@
 
 namespace MiniFAIR\Git_Updater;
 
-
-use Elliptic\EC\KeyPair;
 use MiniFAIR;
-use MiniFAIR\PLC;
+use MiniFAIR\Keys\Key;
 use MiniFAIR\PLC\DID;
 use MiniFAIR\PLC\Util;
 use stdClass;
@@ -162,14 +160,12 @@ function generate_artifact_metadata( DID $did, $url ) {
 	return $next_metadata;
 }
 
-function sign_artifact_data( KeyPair $key, $data ) {
+function sign_artifact_data( Key $key, $data ) {
 	// Hash, then sign the hash.
 	$hash = hash( 'sha256', $data, false );
-	$signature = $key->sign( $hash, 'hex', [
-		'canonical' => true
-	] );
+	$signature = $key->sign( $hash );
 
 	// Convert to compact (IEEE-P1363) form, then to base64url.
-	$compact = hex2bin( PLC\signature_to_compact( $key->ec, $signature ) );
+	$compact = hex2bin( $signature );
 	return Util\base64url_encode( $compact );
 }
