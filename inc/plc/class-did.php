@@ -167,12 +167,21 @@ class DID {
 	}
 
 	/**
+	 * Fetch the last operation on the DID.
+	 *
+	 * This is used to build the `prev` when we're running updates.
+	 *
+	 * @internal This is intentionally uncached, as need the latest data for the DID.
 	 * @throws Exception
 	 * @return Operation
 	 */
 	public function fetch_last_op() : Operation {
 		$url = sprintf( '%s/%s/log/last', static::DIRECTORY_API, $this->id );
-		$response = MiniFAIR\get_remote_url( $url );
+		$response = wp_remote_get( $url, [
+			'headers' => [
+				'Accept' => 'application/did+ld+json',
+			]
+		] );
 		if ( is_wp_error( $response ) ) {
 			throw new Exception( 'Error fetching last op: ' . $response->get_error_message() );
 		}
@@ -199,11 +208,18 @@ class DID {
 	}
 
 	/**
+	 * Fetch the audit log for this DID.
+	 *
+	 * @internal This is intentionally uncached, as need the latest data for the DID.
 	 * @return array|WP_Error
 	 */
 	public function fetch_audit_log() {
 		$url = sprintf( '%s/%s/log/audit', static::DIRECTORY_API, $this->id );
-		$response = MiniFAIR\get_remote_url( $url );
+		$response = wp_remote_get( $url, [
+			'headers' => [
+				'Accept' => 'application/did+ld+json',
+			]
+		] );
 		if ( is_wp_error( $response ) ) {
 			return false;
 		}
@@ -217,11 +233,18 @@ class DID {
 	}
 
 	/**
+	 * Check if the DID has been published.
+	 *
+	 * @internal This is intentionally uncached, as need the latest data for the DID.
 	 * @return bool|WP_Error
 	 */
 	public function is_published() {
 		$url = sprintf( 'https://plc.directory/%s', $this->id );
-		$response = MiniFAIR\get_remote_url( $url );
+		$response = wp_remote_get( $url, [
+			'headers' => [
+				'Accept' => 'application/did+ld+json',
+			]
+		] );
 		if ( is_wp_error( $response ) ) {
 			return false;
 		}
