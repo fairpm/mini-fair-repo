@@ -20,7 +20,7 @@ class Command extends WP_CLI_Command {
 
 		$rot_keys = $did->get_rotation_keys();
 		foreach ( $rot_keys as $key ) {
-			$encoded = Keys\encode_public_key( $key, Keys\CURVE_K256 );
+			$encoded = $key->encode_public();
 			printf(
 				"Rotation key:     %s\n",
 				$encoded
@@ -28,7 +28,7 @@ class Command extends WP_CLI_Command {
 		}
 		$verif_keys = $did->get_verification_keys();
 		foreach ( $verif_keys as $key ) {
-			$encoded = Keys\encode_public_key( $key, Keys\CURVE_K256 );
+			$encoded = $key->encode_public();
 			printf(
 				"Verification key: %s\n",
 				$encoded
@@ -48,7 +48,7 @@ class Command extends WP_CLI_Command {
 
 		$rot_keys = $did->get_rotation_keys();
 		foreach ( $rot_keys as $key ) {
-			$encoded = Keys\encode_public_key( $key, Keys\CURVE_K256 );
+			$encoded = $key->encode_public();
 			printf(
 				"Rotation key:     %s\n",
 				$encoded
@@ -56,7 +56,7 @@ class Command extends WP_CLI_Command {
 		}
 		$verif_keys = $did->get_verification_keys();
 		foreach ( $verif_keys as $key ) {
-			$encoded = Keys\encode_public_key( $key, Keys\CURVE_K256 );
+			$encoded = $key->encode_public();
 			printf(
 				"Verification key: %s\n",
 				$encoded

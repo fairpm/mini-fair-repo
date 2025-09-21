@@ -2,10 +2,8 @@
 
 namespace MiniFAIR\Git_Updater;
 
-
-use Elliptic\EC\KeyPair;
 use MiniFAIR;
-use MiniFAIR\PLC;
+use MiniFAIR\Keys\Key;
 use MiniFAIR\PLC\DID;
 use MiniFAIR\PLC\Util;
 use stdClass;
@@ -101,13 +99,27 @@ function get_artifact_metadata( DID $did, $url ) {
 }
 
 /**
+ * @param DID $did
+ * @param string $url
+ * @param boolean $force_regenerate True to skip cache.
  * @return array|WP_Error
  */
-function generate_artifact_metadata( DID $did, $url ) {
-	$signing_key = $did->get_verification_keys()[0] ?? null;
-	if ( ! $signing_key ) {
-		var_dump( 'No signing key found for DID' );
-		return;
+function generate_artifact_metadata( DID $did, string $url, $force_regenerate = false ) {
+	$keys = $did->get_verification_keys();
+	if ( empty( $keys ) ) {
+		return new WP_Error(
+			'minifair.generate_artifact_metadata.missing_keys',
+			__( 'No verification keys found for DID', 'minifair' )
+		);
+	}
+
+	// todo: make active key selectable
+	$signing_key = end( $keys );
+	if ( empty( $signing_key ) ) {
+		return new WP_Error(
+			'minifair.generate_artifact_metadata.missing_signing_key',
+			__( 'No signing key found for DID', 'minifair' )
+		);
 	}
 
 	$artifact_id = sprintf( '%s:%s', $did->id, substr( sha1( $url ), 0, 8 ) );
@@ -119,7 +131,7 @@ function generate_artifact_metadata( DID $did, $url ) {
 			'Accept' => 'application/octet-stream;q=1.0, */*;q=0.7',
 		],
 	];
-	if ( ! empty( $artifact_metadata ) && isset( $artifact_metadata['etag'] ) ) {
+	if ( ! $force_regenerate && ! empty( $artifact_metadata ) && isset( $artifact_metadata['etag'] ) ) {
 		$opt['headers']['If-None-Match'] = $artifact_metadata['etag'];
 	}
 
@@ -128,7 +140,7 @@ function generate_artifact_metadata( DID $did, $url ) {
 		return $res;
 	}
 
-	if ( 304 === $res['response']['code'] ) {
+	if ( ! $force_regenerate && 304 === $res['response']['code'] ) {
 		// Not modified, no need to update.
 		return $artifact_metadata;
 	}
@@ -151,14 +163,12 @@ function generate_artifact_metadata( DID $did, $url ) {
 	return $next_metadata;
 }
 
-function sign_artifact_data( KeyPair $key, $data ) {
+function sign_artifact_data( Key $key, $data ) {
 	// Hash, then sign the hash.
 	$hash = hash( 'sha256', $data, false );
-	$signature = $key->sign( $hash, 'hex', [
-		'canonical' => true
-	] );
+	$signature = $key->sign( $hash );
 
 	// Convert to compact (IEEE-P1363) form, then to base64url.
-	$compact = hex2bin( PLC\signature_to_compact( $key->ec, $signature ) );
+	$compact = hex2bin( $signature );
 	return Util\base64url_encode( $compact );
 }

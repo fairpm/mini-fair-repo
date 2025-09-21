@@ -2,11 +2,11 @@
 
 namespace MiniFAIR\PLC;
 
-use Elliptic\EC\KeyPair;
 use Exception;
 use MiniFAIR;
 use MiniFAIR\API;
 use MiniFAIR\Keys;
+use MiniFAIR\Keys\Key;
 use WP_Post;
 
 class DID {
@@ -41,17 +41,61 @@ class DID {
 	protected ?string $prev = null;
 
 	/**
-	 * @return KeyPair[]
+	 * @return Keys\ECKey[]
 	 */
 	public function get_rotation_keys() : array {
 		return array_map( fn ( $key ) => Keys\decode_private_key( $key ), $this->rotation_keys );
 	}
 
 	/**
-	 * @return KeyPair[]
+	 * @return Keys\EdDSAKey[]
 	 */
 	public function get_verification_keys() : array {
 		return array_map( fn ( $key ) => Keys\decode_private_key( $key ), $this->verification_keys );
+	}
+
+	/**
+	 * Invalidate a verification key.
+	 *
+	 * Note that update() must be called to persist the change.
+	 *
+	 * @param Key $key The key to invalidate.
+	 * @return bool True if the key was invalidated, false if it was not found.
+	 */
+	public function invalidate_verification_key( Key $key ) {
+		$encoded = $key->encode_private();
+
+		if ( ! in_array( $encoded, $this->verification_keys, true ) ) {
+			// Check for legacy-encoded keys too.
+			if ( method_exists( $key, 'encode_private_legacy_do_not_use_or_you_will_be_fired' ) ) {
+				$legacy_encoded = $key->encode_private_legacy_do_not_use_or_you_will_be_fired();
+				if ( ! in_array( $legacy_encoded, $this->verification_keys, true ) ) {
+					return false;
+				}
+				$encoded = $legacy_encoded;
+			}
+			else {
+				return false;
+			}
+		}
+
+		$this->verification_keys = array_values( array_filter( $this->verification_keys, fn ( $k ) => $k !== $encoded ) );
+		return true;
+	}
+
+	/**
+	 * Generate a new verification key.
+	 *
+	 * Creates a new EdDSA (Ed25519) keypair, and adds it to key list.
+	 *
+	 * Note that update() must be called to persist the change.
+	 *
+	 * @return Key The generated key.
+	 */
+	public function generate_verification_key() : Key {
+		$key = Keys\EdDSAKey::generate( Keys\CURVE_ED25519 );
+		$this->verification_keys[] = $key->encode_private();
+		return $key;
 	}
 
 	/**
@@ -111,7 +155,7 @@ class DID {
 			throw new \Exception( 'Error performing operation: ' . wp_remote_retrieve_body( $response ) );
 		}
 
-		var_dump( $response );
+		return true;
 	}
 
 	public function update() {
@@ -125,6 +169,30 @@ class DID {
 		return $this->perform_operation( $op );
 	}
 
+	public function get_expected_document() : array {
+		$op = $this->prepare_update_op();
+		if ( ! $op ) {
+			$op = $this->fetch_last_op();
+		}
+
+		// Convert the operation to a document.
+		return operation_to_did_document( $this->id, $op );
+	}
+
+	/**
+	 * Prepare the verification keys for the operation.
+	 *
+	 * Generates a unique ID for each key, using its hash.
+	 */
+	protected function get_verification_keys_for_op() : array {
+		$verification_keys = [];
+		foreach ( $this->get_verification_keys() as $key ) {
+			$key_id = substr( hash( 'sha256', $key->encode_public() ), 0, 6 );
+			$verification_keys[ 'fair_' . $key_id ] = $key;
+		}
+		return $verification_keys;
+	}
+
 	protected function prepare_update_op() : ?SignedOperation {
 		// Fetch the previous op.
 		$last_op = $this->fetch_last_op();
@@ -136,9 +204,7 @@ class DID {
 		$update_unsigned = new Operation(
 			type: 'plc_operation',
 			rotationKeys: $this->get_rotation_keys(),
-			verificationMethods: [
-				VERIFICATION_METHOD_ID => $this->get_verification_keys()[0],
-			],
+			verificationMethods: $this->get_verification_keys_for_op(),
 			alsoKnownAs: $last_op->alsoKnownAs,
 			services: [
 				'fairpm_repo' => [
@@ -296,18 +362,13 @@ class DID {
 		$did = new self();
 
 		// Generate an initial keypair for rotation.
-		$rotation_key = Keys\generate_keypair();
-		$encoded_rotation_key = Keys\encode_private_key( $rotation_key, Keys\CURVE_K256 );
+		$rotation_key = Keys\ECKey::generate( Keys\CURVE_K256 );
 		$did->rotation_keys = [
-			$encoded_rotation_key,
+			$rotation_key->encode_private(),
 		];
 
 		// Generate an initial keypair for verification.
-		$verification_key = Keys\generate_keypair();
-		$encoded_verification_key = Keys\encode_private_key( $verification_key, Keys\CURVE_K256 );
-		$did->verification_keys = [
-			$encoded_verification_key,
-		];
+		$did->generate_verification_key();
 
 		// Create the genesis operation.
 		$genesis_unsigned = new Operation(
@@ -315,24 +376,9 @@ class DID {
 			rotationKeys: [
 				$rotation_key,
 			],
-			verificationMethods: [
-				VERIFICATION_METHOD_ID => $verification_key,
-				// 'atproto' => $verification_key,
-			],
+			verificationMethods: $did->get_verification_keys_for_op(),
 			alsoKnownAs: [],
 			services: [],
-			// 'services' => [
-			// 	'fairpm_repo' => [
-			// 		'serviceEndpoint' => 'https://fairpm.example.com/repo',
-			// 		'type' => 'FairPackageManagementRepo',
-			// 	],
-			// ],
-			// services: [
-			// 	'atproto_pds' => [
-			// 		'endpoint' => 'https://example.com/pds',
-			// 		'type' => 'AtprotoPersonalDataServer',
-			// 	],
-			// ],
 		);
 
 		// Sign the op, then generate the DID from it.

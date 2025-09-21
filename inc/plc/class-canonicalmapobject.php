@@ -63,12 +63,14 @@ class CanonicalMapObject extends AbstractCBORObject implements Countable, Iterat
 
     public function __toString(): string
     {
-        uksort($this->data, function ($a, $b) {
-            if (strlen($a) === strlen($b) ) {
-                return strcmp($a, $b);
+        usort($this->data, function ($a, $b) {
+            $a_key = (string) $a->getKey();
+            $b_key = (string) $b->getKey();
+            if (strlen($a_key) === strlen($b_key) ) {
+                return strcmp($a_key, $b_key);
             }
 
-            return strlen($a) <=> strlen($b);
+            return strlen($a_key) <=> strlen($b_key);
         });
 
         $result = parent::__toString();

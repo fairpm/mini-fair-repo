@@ -54,13 +54,28 @@ function get_package_metadata( DID $did ) {
 }
 
 /**
+ * @param DID $did
+ * @param bool $force_regenerate
+ * @return bool|null
+ */
+function update_metadata( DID $did, bool $force_regenerate = false ) {
+	foreach ( get_providers() as $provider ) {
+		if ( $provider->is_authoritative( $did ) ) {
+			return $provider->update_metadata( $did, $force_regenerate );
+		}
+	}
+
+	return null;
+}
+
+/**
  * @param string $url URL.
  * @param array $opt wp_remote_get options.
  * @return array|WP_Error
  */
 function get_remote_url( $url, $opt = null ) {
 	$opt = $opt ?? [ 'headers' => [ 'Accept' => 'application/did+ld+json' ] ];
-	$cache_key = CACHE_PREFIX . sha1( $url );
+	$cache_key = CACHE_PREFIX . sha1( $url ) . sha1( serialize( $opt ) );
 	$response = wp_cache_get( $cache_key );
 	if ( ! $response ) {
 		$response = wp_remote_get( $url, $opt );
