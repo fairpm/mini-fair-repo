@@ -64,7 +64,6 @@ function get_package_data( WP_REST_Request $request ) {
 
 	$did = DID::get( $id );
 	if ( empty( $did ) ) {
-		echo 'wat';
 		return new WP_Error(
 			'minifair.get_package.not_found',
 			__( 'Package not found.', 'minifair' ),
