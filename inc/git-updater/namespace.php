@@ -165,10 +165,9 @@ function generate_artifact_metadata( DID $did, string $url, $force_regenerate = 
 
 function sign_artifact_data( Key $key, $data ) {
 	// Hash, then sign the hash.
-	$hash = hash( 'sha256', $data, false );
+	$hash = hash( 'sha384', $data, false );
 	$signature = $key->sign( $hash );
 
-	// Convert to compact (IEEE-P1363) form, then to base64url.
 	$compact = hex2bin( $signature );
 	return Util\base64url_encode( $compact );
 }
