@@ -126,11 +126,9 @@ function generate_artifact_metadata( DID $did, string $url, $force_regenerate = 
 	$artifact_metadata = get_option( 'minifair_artifact_' . $artifact_id, null );
 
 	// Fetch the artifact.
-	$opt = [
-		'headers' => [
-			'Accept' => 'application/octet-stream;q=1.0, */*;q=0.7',
-		],
-	];
+	$opt = str_contains( $url, 'api.github.com' ) && str_contains( $url, 'releases/assets' )
+		? [ 'headers' => [ 'Accept' => 'application/octet-stream' ] ]
+		: [];
 	if ( ! $force_regenerate && ! empty( $artifact_metadata ) && isset( $artifact_metadata['etag'] ) ) {
 		$opt['headers']['If-None-Match'] = $artifact_metadata['etag'];
 	}
