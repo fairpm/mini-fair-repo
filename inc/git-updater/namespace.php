@@ -29,6 +29,9 @@ function on_load() : void {
  * @param object $repo_api Repository API object.
  */
 function update_on_get_remote_meta( stdClass $repo, $repo_api ) : void {
+	global $release_asset;
+
+	$release_asset = $repo->release_asset ?? false;
 	$err = update_fair_data( $repo, $repo_api );
 	if ( is_wp_error( $err ) ) {
 		// Log the error.
@@ -66,7 +69,7 @@ function update_fair_data( $repo, $repo_api ) : ?WP_Error {
 	foreach ( $versions as $tag => $url ) {
 		// This probably wants to be tied to the commit SHA, so that
 		// if tags are changed, we refresh automatically.
-		$data = generate_artifact_metadata( $did, $url, $repo->release_asset );
+		$data = generate_artifact_metadata( $did, $url );
 		if ( is_wp_error( $data ) ) {
 			$errors[] = $data;
 		}
@@ -101,11 +104,12 @@ function get_artifact_metadata( DID $did, $url ) {
 /**
  * @param DID $did
  * @param string $url
- * @param boolean $release_asset True if this is a release asset, false if it's a source archive.
  * @param boolean $force_regenerate True to skip cache.
  * @return array|WP_Error
  */
-function generate_artifact_metadata( DID $did, string $url, $release_asset = false, $force_regenerate = false ) {
+function generate_artifact_metadata( DID $did, string $url, $force_regenerate = false ) {
+	global $release_asset;
+
 	$keys = $did->get_verification_keys();
 	if ( empty( $keys ) ) {
 		return new WP_Error(
@@ -127,7 +131,13 @@ function generate_artifact_metadata( DID $did, string $url, $release_asset = fal
 	$artifact_metadata = get_option( 'minifair_artifact_' . $artifact_id, null );
 
 	// Fetch the artifact.
-	$opt = $release_asset ? [ 'headers' => [ 'Accept' => 'application/octet-stream' ] ] : [];
+	if ( $release_asset ) {
+		// For release assets, we want the raw binary.
+		$opt = [ 'headers' => [ 'Accept' => 'application/octet-stream' ] ];
+	} else {
+		// For source archives, we want the archive file.
+		$opt = [ 'headers' => [ 'Accept' => 'application/vnd.github+json' ] ];
+	}
 	if ( ! $force_regenerate && ! empty( $artifact_metadata ) && isset( $artifact_metadata['etag'] ) ) {
 		$opt['headers']['If-None-Match'] = $artifact_metadata['etag'];
 	}
