@@ -126,13 +126,9 @@ function generate_artifact_metadata( DID $did, string $url, $force_regenerate = 
 	$artifact_metadata = get_option( 'minifair_artifact_' . $artifact_id, null );
 
 	// Fetch the artifact.
-	if ( str_contains( $url, 'api.github.com' ) && str_contains( $url, 'releases/assets' ) ) {
-		// For release assets, we want the raw binary.
-		$opt = [ 'headers' => [ 'Accept' => 'application/octet-stream' ] ];
-	} else {
-		// For source archives, we want the archive file.
-		$opt = [ 'headers' => [ 'Accept' => 'application/vnd.github+json' ] ];
-	}
+	$opt = str_contains( $url, 'api.github.com' ) && str_contains( $url, 'releases/assets' )
+		? [ 'headers' => [ 'Accept' => 'application/octet-stream' ] ]
+		: [];
 	if ( ! $force_regenerate && ! empty( $artifact_metadata ) && isset( $artifact_metadata['etag'] ) ) {
 		$opt['headers']['If-None-Match'] = $artifact_metadata['etag'];
 	}
