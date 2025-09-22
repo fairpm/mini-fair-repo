@@ -252,7 +252,7 @@ class Provider implements ProviderInterface {
 		foreach ( $versions as $tag => $url ) {
 			// This probably wants to be tied to the commit SHA, so that
 			// if tags are changed, we refresh automatically.
-			$data = generate_artifact_metadata( $did, $url, $force_regenerate );
+			$data = generate_artifact_metadata( $did, $url, $repo_api->type->release_asset, $force_regenerate );
 			if ( is_wp_error( $data ) ) {
 				$errors[] = $data;
 			}

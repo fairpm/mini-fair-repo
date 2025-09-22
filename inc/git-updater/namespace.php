@@ -66,7 +66,7 @@ function update_fair_data( $repo, $repo_api ) : ?WP_Error {
 	foreach ( $versions as $tag => $url ) {
 		// This probably wants to be tied to the commit SHA, so that
 		// if tags are changed, we refresh automatically.
-		$data = generate_artifact_metadata( $did, $url );
+		$data = generate_artifact_metadata( $did, $url, $repo->release_asset );
 		if ( is_wp_error( $data ) ) {
 			$errors[] = $data;
 		}
@@ -101,10 +101,11 @@ function get_artifact_metadata( DID $did, $url ) {
 /**
  * @param DID $did
  * @param string $url
+ * @param boolean $release_asset True if this is a release asset, false if it's a source archive.
  * @param boolean $force_regenerate True to skip cache.
  * @return array|WP_Error
  */
-function generate_artifact_metadata( DID $did, string $url, $force_regenerate = false ) {
+function generate_artifact_metadata( DID $did, string $url, $release_asset = false, $force_regenerate = false ) {
 	$keys = $did->get_verification_keys();
 	if ( empty( $keys ) ) {
 		return new WP_Error(
@@ -126,11 +127,7 @@ function generate_artifact_metadata( DID $did, string $url, $force_regenerate = 
 	$artifact_metadata = get_option( 'minifair_artifact_' . $artifact_id, null );
 
 	// Fetch the artifact.
-	$opt = [
-		'headers' => [
-			'Accept' => 'application/octet-stream;q=1.0, */*;q=0.7',
-		],
-	];
+	$opt = $release_asset ? [ 'headers' => [ 'Accept' => 'application/octet-stream' ] ] : [];
 	if ( ! $force_regenerate && ! empty( $artifact_metadata ) && isset( $artifact_metadata['etag'] ) ) {
 		$opt['headers']['If-None-Match'] = $artifact_metadata['etag'];
 	}
