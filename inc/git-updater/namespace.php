@@ -29,9 +29,6 @@ function on_load() : void {
  * @param object $repo_api Repository API object.
  */
 function update_on_get_remote_meta( stdClass $repo, $repo_api ) : void {
-	global $release_asset;
-
-	$release_asset = $repo->release_asset ?? false;
 	$err = update_fair_data( $repo, $repo_api );
 	if ( is_wp_error( $err ) ) {
 		// Log the error.
@@ -108,8 +105,6 @@ function get_artifact_metadata( DID $did, $url ) {
  * @return array|WP_Error
  */
 function generate_artifact_metadata( DID $did, string $url, $force_regenerate = false ) {
-	global $release_asset;
-
 	$keys = $did->get_verification_keys();
 	if ( empty( $keys ) ) {
 		return new WP_Error(
@@ -131,7 +126,7 @@ function generate_artifact_metadata( DID $did, string $url, $force_regenerate = 
 	$artifact_metadata = get_option( 'minifair_artifact_' . $artifact_id, null );
 
 	// Fetch the artifact.
-	if ( $release_asset ) {
+	if ( str_contains( $url, 'api.github.com' ) && str_contains( $url, 'releases/assets' ) ) {
 		// For release assets, we want the raw binary.
 		$opt = [ 'headers' => [ 'Accept' => 'application/octet-stream' ] ];
 	} else {
