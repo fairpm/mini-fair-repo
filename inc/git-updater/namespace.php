@@ -6,6 +6,7 @@ use MiniFAIR;
 use MiniFAIR\Keys\Key;
 use MiniFAIR\PLC\DID;
 use MiniFAIR\PLC\Util;
+use MiniFAIR\Provider as ProviderInterface;
 use stdClass;
 use WP_Error;
 
@@ -19,7 +20,22 @@ function on_load() : void {
 		return;
 	}
 
+	add_filter( 'minifair.providers', __NAMESPACE__ . '\\register_provider' ) ;
 	add_action( 'get_remote_repo_meta', __NAMESPACE__ . '\\update_on_get_remote_meta', 20, 2 ) ;
+}
+
+/**
+ * Registers the Git Updater provider.
+ *
+ * @param array<string, ProviderInterface> $providers The previously registered providers.
+ *
+ * @return array<string, ProviderInterface>
+ */
+function register_provider( array $providers ): array {
+    return [
+        ...$providers,
+        Provider::TYPE => new Provider(),
+    ];
 }
 
 /**
