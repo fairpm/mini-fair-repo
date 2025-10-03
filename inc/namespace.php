@@ -17,7 +17,7 @@ function bootstrap() {
 }
 
 /**
- * @return Provider[]
+ * @return array<string, Provider>
  */
 function get_providers() : array {
 	static $providers = [];
@@ -25,10 +25,8 @@ function get_providers() : array {
 		return $providers;
 	}
 
-	$providers = [
-		Git_Updater\Provider::TYPE => new Git_Updater\Provider(),
-	];
-	$providers = apply_filters( 'minifair.providers', $providers );
+	$providers = apply_filters( 'minifair.providers', [] );
+
 	return $providers;
 }
 
