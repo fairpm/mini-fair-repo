@@ -32,10 +32,9 @@ function on_load() : void {
  * @return array<string, ProviderInterface>
  */
 function register_provider( array $providers ): array {
-    return [
-        ...$providers,
+    return array_merge( $providers, [
         Provider::TYPE => new Provider(),
-    ];
+    ] );
 }
 
 /**
