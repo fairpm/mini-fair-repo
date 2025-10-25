@@ -15,7 +15,7 @@
         "source": "https://github.com/fairpm/mini-fair-repo"
     },
     "require": {
-        "php": ">=7.4",
+        "php": ">=8.3",
         "yocto/yoclib-multibase": "^1.2",
         "simplito/elliptic-php": "^1.0",
         "spomky-labs/cbor-php": "^3.1"

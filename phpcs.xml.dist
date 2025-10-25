@@ -15,7 +15,7 @@
 	<arg value="ps"/>
 
 	<!-- Set a minimum PHP version for PHPCompatibility -->
-	<config name="testVersion" value="7.4-" />
+	<config name="testVersion" value="8.3-" />
 
 	<!-- Set the minimum support WordPress version -->
 	<config name="minimum_supported_wp_version" value="6.4"/>
