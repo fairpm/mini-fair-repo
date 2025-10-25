@@ -23,6 +23,9 @@
 	<!-- Set the text domain -->
 	<config name="text_domain" value="mini-fair"/>
 
+	<!-- Ignore PHP-related errors. -->
+	<ini name="error_reporting" value="E_ALL &#38; ~E_DEPRECATED" />
+
 	<!-- Use HM Coding Standards -->
 	<rule ref="vendor/humanmade/coding-standards">
 		<!-- Deprecated in PHPCS. Removal in 4.0.0 -->
