@@ -15,7 +15,7 @@ class MetadataDocument implements JsonSerializable {
 	public string $license;
 	public array $security = [];
 	public array $keywords = [];
-
+	public string $last_updated;
 	public array $sections = [];
 
 	/**
@@ -37,6 +37,7 @@ class MetadataDocument implements JsonSerializable {
 			'security' => $this->security,
 			'keywords' => $this->keywords,
 			'sections' => $this->sections,
+			'last_updated' => $this->last_updated,
 			'releases' => $this->releases,
 		];
 	}
