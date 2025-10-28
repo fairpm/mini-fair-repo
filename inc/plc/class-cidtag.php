@@ -38,7 +38,8 @@ final class CIDTag extends Tag {
 	 * @param CBORObject $object                The tag object.
 	 * @return self
 	 */
-		return new self( $additionalInformation, $data, $object );
+	public static function createFromLoadedData( int $additionalInformation, ?string $data, CBORObject $object ): Tag { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.VariableNotSnakeCase -- Inherited from parent.
+		return new self( $additionalInformation, $data, $object ); // phpcs:ignore WordPress.NamingConventions.ValidVariableName.VariableNotSnakeCase -- Inherited from parent.
 	}
 
 	/**

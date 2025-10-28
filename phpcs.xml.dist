@@ -36,6 +36,9 @@
 
 		<!-- Allow use of error_log and var_dump for debugging purposes -->
 		<exclude name="WordPress.PHP.DevelopmentFunctions.error_log_var_dump" />
+
+		<!-- Don't blame the calling code for non-snake case properties. -->
+		<exclude name="WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase" />
 	</rule>
 
 	<!-- Exclude the main plugin file from namespace file rules -->

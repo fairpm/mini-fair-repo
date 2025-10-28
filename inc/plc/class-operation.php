@@ -11,8 +11,8 @@ use Exception;
 use JsonSerializable;
 use MiniFAIR\Keys;
 use MiniFAIR\Keys\Key;
-use Exception;
-use JsonSerializable;
+
+// phpcs:disable WordPress.NamingConventions.ValidVariableName.VariableNotSnakeCase -- Intentional casing for JSON.
 
 /**
  * Operation class.
