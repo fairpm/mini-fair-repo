@@ -12,8 +12,6 @@ use JsonSerializable;
 use MiniFAIR\Keys;
 use MiniFAIR\Keys\Key;
 
-// phpcs:disable WordPress.NamingConventions.ValidVariableName.VariableNotSnakeCase -- Intentional casing for JSON.
-
 /**
  * Operation class.
  */
