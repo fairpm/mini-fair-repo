@@ -121,9 +121,9 @@ class Command extends WP_CLI_Command {
 	 */
 	public function import( $args, $assoc_args ) {
 		$did = new DID();
-		// $did->set_id( $args[0] );
-		// $did->set_rotation_keys( $args[1] );
-		// $did->set_verification_keys( $args[2] );
+		// $did->set_id( $args[0] );.
+		// $did->set_rotation_keys( $args[1] );.
+		// $did->set_verification_keys( $args[2] );.
 		$did->save();
 	}
 }

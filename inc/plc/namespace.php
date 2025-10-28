@@ -180,19 +180,19 @@ function cid_for_operation( SignedOperation $op ) : string {
 	$hash = hash( 'sha256', $cbor, true );
 
 	// The bit layout for CIDs is:
-	// Version (CIDv1 = 0x01)
+	// Version (CIDv1 = 0x01).
 	$cid = "\x01";
 
-	// Type (dag-cbor = 0x71)
+	// Type (dag-cbor = 0x71).
 	$cid .= "\x71";
 
-	// Multihash type (sha-256 = 0x12)
-	$cid .= "\x12"; // sha-256
+	// Multihash type (sha-256 = 0x12).
+	$cid .= "\x12"; // sha-256.
 
-	// Multihash length
+	// Multihash length.
 	$cid .= pack( 'C', strlen( $hash ) );
 
-	// Hash digest
+	// Hash digest.
 	$cid .= $hash;
 
 	// Then, encode to base32 multibase.

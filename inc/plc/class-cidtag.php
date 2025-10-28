@@ -53,12 +53,12 @@ final class CIDTag extends Tag {
 
 		$decoded = Multibase::decode( $cid );
 
-		// CID data begins with \x01\x71\x12
+		// CID data begins with \x01\x71\x12.
 		if ( ! str_starts_with( $decoded, "\x01\x71\x12" ) ) {
 			throw new InvalidArgumentException( 'CID must start with 0x01 0x71 0x12' );
 		}
 
-		// Prefix with the "Multibase identity prefix" (0x00)
+		// Prefix with the "Multibase identity prefix" (0x00).
 		$bytes = "\x00" . $decoded;
 		return new self( $ai, $data, ByteStringObject::create( $bytes ) );
 	}

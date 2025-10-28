@@ -103,14 +103,7 @@ function base32_decode($data) {
 	$charMap = array_flip(str_split(BASE32_CHARS)); // char=>value map
 	$charMap += array_flip(str_split(strtoupper(BASE32_CHARS))); // add upper-case alternatives
 
-	for ($i = 0; $i < $dataSize; $i++)
-	{
-		$c = $data[$i];
-		if (!isset($charMap[$c]))
-		{
-			if ($c == " " || $c == "\r" || $c == "\n" || $c == "\t")
-				continue; // ignore these safe characters
-			throw new Exception('Encoded string contains unexpected char #'.ord($c)." at offset $i (using improper alphabet?)");
+				continue; // ignore these safe characters.
 		}
 		$b = $charMap[$c];
 		$buf = ($buf << 5) | $b;

@@ -133,7 +133,7 @@ function generate_artifact_metadata( DID $did, string $url, $force_regenerate = 
 		);
 	}
 
-	// todo: make active key selectable
+	// todo: make active key selectable.
 	$signing_key = end( $keys );
 	if ( empty( $signing_key ) ) {
 		return new WP_Error(

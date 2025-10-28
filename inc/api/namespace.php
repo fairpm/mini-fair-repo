@@ -74,7 +74,7 @@ function get_package_data( WP_REST_Request $request ) {
 
 	// Check that we actually manage this package.
 	if ( ! str_starts_with( $id, 'did:plc:' ) ) {
-		// todo, implement did:web
+		// todo, implement did:web.
 		return new WP_Error(
 			'minifair.get_package.invalid_id',
 			"Can't manage non-PLC package",
