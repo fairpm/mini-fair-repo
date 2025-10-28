@@ -93,7 +93,7 @@ function update_fair_data( $repo, $repo_api ) : ?WP_Error {
 
 	$err = new WP_Error(
 		'minifair.update_fair_data.error',
-		__( 'Error updating FAIR data for repository.', 'minifair' )
+		__( 'Error updating FAIR data for repository.', 'mini-fair' )
 	);
 	foreach ( $errors as $error ) {
 		$err->merge_from( $error );
@@ -124,7 +124,7 @@ function generate_artifact_metadata( DID $did, string $url, $force_regenerate = 
 	if ( empty( $keys ) ) {
 		return new WP_Error(
 			'minifair.generate_artifact_metadata.missing_keys',
-			__( 'No verification keys found for DID', 'minifair' )
+			__( 'No verification keys found for DID', 'mini-fair' )
 		);
 	}
 
@@ -133,7 +133,7 @@ function generate_artifact_metadata( DID $did, string $url, $force_regenerate = 
 	if ( empty( $signing_key ) ) {
 		return new WP_Error(
 			'minifair.generate_artifact_metadata.missing_signing_key',
-			__( 'No signing key found for DID', 'minifair' )
+			__( 'No signing key found for DID', 'mini-fair' )
 		);
 	}
 
@@ -161,7 +161,7 @@ function generate_artifact_metadata( DID $did, string $url, $force_regenerate = 
 		// Handle unexpected response code.
 		return new WP_Error(
 			'minifair.artifact.fetch_error',
-			sprintf( __( 'Error fetching artifact: %s', 'minifair' ), $res['response']['code'] ),
+			sprintf( __( 'Error fetching artifact: %s', 'mini-fair' ), $res['response']['code'] ),
 			[ 'status' => $res['response']['code'] ]
 		);
 	}

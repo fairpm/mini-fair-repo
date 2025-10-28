@@ -51,7 +51,7 @@ class Provider implements ProviderInterface {
 			if ( empty( $pkg->did ) ) {
 				$problems[ $pkg->file ] = new WP_Error(
 					'minifair.git_updater.missing_did',
-					sprintf( __( 'Package %s is missing a DID. Specify it in the Plugin ID/Theme ID header.', 'minifair' ), $pkg->name ),
+					sprintf( __( 'Package %s is missing a DID. Specify it in the Plugin ID/Theme ID header.', 'mini-fair' ), $pkg->name ),
 					[ 'status' => WP_Http::NOT_FOUND ]
 				);
 				continue;
@@ -61,7 +61,7 @@ class Provider implements ProviderInterface {
 			if ( empty( $did ) ) {
 				$problems[ $pkg->file ] = new WP_Error(
 					'minifair.git_updater.invalid_did',
-					sprintf( __( "Package %s has a DID (%s), but the DID's keys are not registered on this site.", 'minifair' ), $pkg->name, $pkg->did ),
+					sprintf( __( "Package %s has a DID (%s), but the DID's keys are not registered on this site.", 'mini-fair' ), $pkg->name, $pkg->did ),
 					[ 'status' => WP_Http::NOT_FOUND ]
 				);
 				continue;
@@ -108,7 +108,7 @@ class Provider implements ProviderInterface {
 		if ( ! $package ) {
 			return new WP_Error(
 				'minifair.get_package.not_found',
-				__( 'Package not found.', 'minifair' ),
+				__( 'Package not found.', 'mini-fair' ),
 				[ 'status' => WP_Http::NOT_FOUND ]
 			);
 		}
@@ -254,7 +254,7 @@ class Provider implements ProviderInterface {
 		if ( ! $package ) {
 			return new WP_Error(
 				'minifair.get_package.not_found',
-				__( 'Package not found.', 'minifair' ),
+				__( 'Package not found.', 'mini-fair' ),
 				[ 'status' => WP_Http::NOT_FOUND ]
 			);
 		}
@@ -312,7 +312,7 @@ class Provider implements ProviderInterface {
 
 		$err = new WP_Error(
 			'minifair.update_fair_data.error',
-			__( 'Error updating FAIR data for repository.', 'minifair' )
+			__( 'Error updating FAIR data for repository.', 'mini-fair' )
 		);
 		foreach ( $errors as $error ) {
 			$err->merge_from( $error );
