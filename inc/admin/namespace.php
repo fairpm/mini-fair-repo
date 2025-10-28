@@ -198,7 +198,7 @@ function render_editor() {
 	echo esc_html( $title );
 	echo '</h1>';
 
-	/** @var WP_Post */
+	/** @var WP_Post */ // phpcs:ignore Generic.Commenting.DocComment.MissingShort -- Typing
 	$post = $GLOBALS['post'];
 	if ( $post->post_status === 'auto-draft' ) {
 		// If the post is an auto-draft, we are creating a new PLC DID.
