@@ -40,7 +40,7 @@ function on_load() : void {
 }
 
 /**
- * Registers the Git Updater provider.
+ * Register the Git Updater provider.
  *
  * @param array<string, ProviderInterface> $providers The previously registered providers.
  *
