@@ -247,6 +247,8 @@ class Provider implements ProviderInterface {
 	/**
 	 * Get the release document for a given package ID and version.
 	 *
+	 * @param DID    $did     The DID object.
+	 * @param string $version The version to get.
 	 * @return API\ReleaseDocument|WP_Error
 	 */
 	public function get_release( DID $did, string $version ) {

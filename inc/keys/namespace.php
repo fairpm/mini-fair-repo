@@ -115,7 +115,6 @@ function decode_did_key( string $did ) : Key {
  *
  * @throws Exception If the curve is not supported.
  * @param Key $key The keypair object.
- * @param string $curve The curve to use (CURVE_K256 or CURVE_P256).
  * @return string The did:key: string.
  */
 function encode_did_key( Key $key ) : string {

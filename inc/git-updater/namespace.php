@@ -40,8 +40,9 @@ function on_load() : void {
 /**
  * Update necessary FAIR data during the Git Updater get_remote_repo_meta().
  *
- * @param stdClass $repo Repository to update.
- * @param object $repo_api Repository API object.
+ * @param stdClass $repo     Repository to update.
+ * @param object   $repo_api Repository API object.
+ * @return void
  */
 function update_on_get_remote_meta( stdClass $repo, $repo_api ) : void {
 	$err = update_fair_data( $repo, $repo_api );
@@ -56,6 +57,8 @@ function update_on_get_remote_meta( stdClass $repo, $repo_api ) : void {
  *
  * Generates metadata for each tag's artifact.
  *
+ * @param stdClass $repo     Repository to update.
+ * @param object   $repo_api Repository API object.
  * @return null|WP_Error Error if one occurred, null otherwise.
  */
 function update_fair_data( $repo, $repo_api ) : ?WP_Error {
@@ -114,10 +117,12 @@ function get_artifact_metadata( DID $did, $url ) {
 }
 
 /**
- * @param DID $did
- * @param string $url
- * @param boolean $force_regenerate True to skip cache.
- * @return array|WP_Error
+ * Generate an artifact's metadata.
+ *
+ * @param DID    $did              The DID object.
+ * @param string $url              The artifact's download URL.
+ * @param bool   $force_regenerate Optional. True to skip cache. Default false.
+ * @return array|WP_Error The artifact's metadata, or WP_Error on failure.
  */
 function generate_artifact_metadata( DID $did, string $url, $force_regenerate = false ) {
 	$keys = $did->get_verification_keys();

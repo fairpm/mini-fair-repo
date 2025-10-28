@@ -163,6 +163,7 @@ function render_settings_page() {
  * Fetch the raw data for the DID document.
  *
  * @internal This is intentionally uncached, as need the latest data for the DID.
+ * @param DID $did The DID.
  * @return stdClass|WP_Error
  */
 function fetch_did( DID $did ) {

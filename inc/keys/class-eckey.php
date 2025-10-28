@@ -45,6 +45,7 @@ class ECKey implements Key {
 	 *
 	 * @see https://atproto.com/specs/cryptography
 	 *
+	 * @throws Exception If the curve is not supported.
 	 * @return string The multibase public key string (starts with z).
 	 */
 	public function encode_public() : string {
@@ -63,6 +64,8 @@ class ECKey implements Key {
 	 *
 	 * @see https://atproto.com/specs/cryptography
 	 *
+	 * @throws Exception If the key is public.
+	 * @throws Exception If the curve is unsupported.
 	 * @return string The multibase private key string (starts with z).
 	 */
 	public function encode_private() : string {
@@ -112,7 +115,7 @@ class ECKey implements Key {
 	 *           we need to do it ourselves. Compact signatures are just the r and
 	 *           s bytes concatenated, but must be padded to 32 bytes each.
 	 *
-	 * @param EC $ec The elliptic curve object.
+	 * @param EC        $ec        The elliptic curve object.
 	 * @param Signature $signature The signature object.
 	 * @return string The compact signature.
 	 */
@@ -125,6 +128,7 @@ class ECKey implements Key {
 	/**
 	 * Sign data using the private key.
 	 *
+	 * @throws Exception If the key is public.
 	 * @param string $data The data to sign, as a hex-encoded string.
 	 * @return string The signature encoded as a binary string.
 	 */
@@ -158,6 +162,7 @@ class ECKey implements Key {
 	 * @see https://atproto.com/specs/cryptography
 	 *
 	 * @throws Exception If the curve is not supported.
+	 * @param string $curve The curve.
 	 * @return static The generated keypair object.
 	 */
 	public static function generate( string $curve ) : static {

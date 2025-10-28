@@ -61,7 +61,7 @@ const VERIFICATION_METHOD_PREFIX = 'fair_';
  * Sign an operation.
  *
  * @param Operation $data The operation to sign.
- * @param Key $signing_key The signing key.
+ * @param Key       $key  The signing key.
  * @return SignedOperation The signed operation.
  */
 function sign_operation( Operation $data, Key $key ) : SignedOperation {

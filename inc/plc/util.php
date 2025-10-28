@@ -44,6 +44,10 @@ function base64url_decode( string $data ) : string {
  * @copyright 2016 Denis Borzenko
  * @license https://github.com/bbars/utils/blob/master/LICENSE MIT
  * @see https://github.com/bbars/utils
+ *
+ * @param string $data The data to encode.
+ * @param bool   $pad_right whether to pad the encoded string with equals (=) characters.
+ * @return string The encoded string.
  */
 function base32_encode($data, $padRight = false) {
 	$dataSize = strlen($data);
@@ -85,6 +89,10 @@ function base32_encode($data, $padRight = false) {
  * @copyright 2016 Denis Borzenko
  * @license https://github.com/bbars/utils/blob/master/LICENSE MIT
  * @see https://github.com/bbars/utils
+ *
+ * @throws Exception If the encoded string contains an unsupported character.
+ * @param string $data The encoded string.
+ * @return string The decoded string.
  */
 function base32_decode($data) {
 	$data = rtrim($data, "=\x20\t\n\r\0\x0B");

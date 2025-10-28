@@ -88,7 +88,11 @@ class Command extends WP_CLI_Command {
 	 *
 	 * ## OPTIONS
 	 * <did>
-	 * : The DID to update.
+	 * : The DID to update
+	 *
+	 * @param array $args       The command line arguments.
+	 * @param array $assoc_args The associative command line arguments.
+	 * @return void
 	 */
 	public function update( $args, $assoc_args ) {
 		$did = DID::get( $args[0] );
@@ -113,6 +117,8 @@ class Command extends WP_CLI_Command {
 	 * <verification_keys>
 	 * : The verification keys for the DID.
 	 *
+	 * @param array $args       The command line arguments.
+	 * @param array $assoc_args The associative command line arguments.
 	 */
 	public function import( $args, $assoc_args ) {
 		$did = new DID();

@@ -31,7 +31,7 @@ interface Provider {
 	/**
 	 * Check if this provider is authoritative for the given DID.
 	 *
-	 * @param string $did The DID to check.
+	 * @param DID $did The DID to check.
 	 * @return bool True if this provider is authoritative for the DID, false otherwise.
 	 */
 	public function is_authoritative( DID $did ) : bool;
@@ -47,7 +47,8 @@ interface Provider {
 	/**
 	 * Get the release document for a given package ID and version.
 	 *
-	 * @param DID $did The DID object representing the package.
+	 * @param DID    $did     The DID object representing the package.
+	 * @param string $version The version to get.
 	 * @return API\ReleaseDocument|WP_Error
 	 */
 	public function get_release( DID $did, string $version );

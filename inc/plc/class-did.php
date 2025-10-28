@@ -65,6 +65,8 @@ class DID {
 	protected ?string $prev = null;
 
 	/**
+	 * Get the rotation keys.
+	 *
 	 * @return Keys\ECKey[]
 	 */
 	public function get_rotation_keys() : array {
@@ -72,6 +74,8 @@ class DID {
 	}
 
 	/**
+	 * Get the verification keys.
+	 *
 	 * @return Keys\EdDSAKey[]
 	 */
 	public function get_verification_keys() : array {
@@ -235,6 +239,8 @@ class DID {
 	 * Prepare the verification keys for the operation.
 	 *
 	 * Generates a unique ID for each key, using its hash.
+	 *
+	 * @return array
 	 */
 	protected function get_verification_keys_for_op() : array {
 		$verification_keys = [];
@@ -295,7 +301,8 @@ class DID {
 	 * This is used to build the `prev` when we're running updates.
 	 *
 	 * @internal This is intentionally uncached, as need the latest data for the DID.
-	 * @throws Exception
+	 * @throws Exception If the response is a WP_Error.
+	 * @throws Exception If the response's body is invalid JSON.
 	 * @return Operation
 	 */
 	public function fetch_last_op() : Operation {
@@ -380,6 +387,8 @@ class DID {
 
 	/**
 	 * Has this DID been registered?
+	 *
+	 * @var bool
 	 */
 	protected bool $created = false;
 
