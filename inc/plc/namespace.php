@@ -26,6 +26,7 @@ const VERIFICATION_METHOD_PREFIX = 'fair_';
  *
  * @return void
  */
+function bootstrap() : void {
 	add_action( 'init', __NAMESPACE__ . '\\register_types' );
 
 	if ( defined( 'WP_CLI' ) && WP_CLI ) {
@@ -38,6 +39,7 @@ const VERIFICATION_METHOD_PREFIX = 'fair_';
  *
  * @return void
  */
+function register_types() : void {
 	register_post_type( DID::POST_TYPE, [
 		'public' => true,
 		'show_ui' => true,
