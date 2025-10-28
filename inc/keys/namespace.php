@@ -8,8 +8,6 @@
 namespace MiniFAIR\Keys;
 
 use Exception;
-use Elliptic\EC;
-use Elliptic\EC\KeyPair;
 use YOCLIB\Multiformats\Multibase\Multibase;
 
 const CURVE_K256 = 'secp256k1';

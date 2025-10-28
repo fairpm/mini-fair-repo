@@ -7,12 +7,12 @@
 
 namespace MiniFAIR\PLC;
 
+use CBOR\OtherObject\NullObject;
 use CBOR\{
 	ListObject,
 	MapItem,
 	TextStringObject,
 };
-use CBOR\OtherObject\NullObject;
 use MiniFAIR\Admin;
 use MiniFAIR\Keys;
 use MiniFAIR\Keys\Key;

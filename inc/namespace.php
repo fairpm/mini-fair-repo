@@ -7,6 +7,8 @@
 
 namespace MiniFAIR;
 
+use MiniFAIR\PLC\DID;
+
 const CACHE_PREFIX = 'minifair-';
 const CACHE_LIFETIME = 12 * HOUR_IN_SECONDS;
 

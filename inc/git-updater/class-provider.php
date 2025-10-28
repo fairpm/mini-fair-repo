@@ -9,8 +9,8 @@ namespace MiniFAIR\Git_Updater;
 
 use Fragen\Singleton;
 use MiniFAIR\API\MetadataDocument;
-use MiniFAIR\Provider as ProviderInterface;
 use MiniFAIR\PLC\DID;
+use MiniFAIR\Provider as ProviderInterface;
 use stdClass;
 use WP_Error;
 use WP_Http;

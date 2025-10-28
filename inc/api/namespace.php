@@ -8,14 +8,13 @@
 namespace MiniFAIR\API;
 
 use MiniFAIR;
-
-const REST_NAMESPACE = 'minifair/v1';
-
 use MiniFAIR\PLC\DID;
 use WP_Error;
 use WP_Http;
 use WP_REST_Request;
 use WP_REST_Server;
+
+const REST_NAMESPACE = 'minifair/v1';
 
 /**
  * Bootstrap.

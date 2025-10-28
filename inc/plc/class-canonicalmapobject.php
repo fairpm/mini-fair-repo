@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace MiniFAIR\PLC;
 
+use ArrayAccess;
+use ArrayIterator;
 use CBOR\{
 	AbstractCBORObject,
 	CBORObject,
@@ -16,14 +18,12 @@ use CBOR\{
 	MapItem,
 	Normalizable
 };
-use ArrayAccess;
-use ArrayIterator;
 use Countable;
+use function array_key_exists;
+use function count;
 use InvalidArgumentException;
 use Iterator;
 use IteratorAggregate;
-use function array_key_exists;
-use function count;
 
 /**
  * MapObject, implementing the canonicalization algorithm.

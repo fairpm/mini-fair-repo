@@ -7,6 +7,8 @@
 
 namespace MiniFAIR\PLC;
 
+use Exception;
+use JsonSerializable;
 use MiniFAIR\Keys;
 use MiniFAIR\Keys\Key;
 use Exception;

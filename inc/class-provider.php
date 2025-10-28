@@ -8,7 +8,6 @@
 namespace MiniFAIR;
 
 use MiniFAIR\PLC\DID;
-use WP_Error;
 
 /**
  * Provider interface.

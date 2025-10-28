@@ -7,7 +7,6 @@
 
 namespace MiniFAIR\PLC;
 
-use MiniFAIR\Keys;
 use WP_CLI;
 use WP_CLI_Command;
 

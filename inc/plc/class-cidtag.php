@@ -12,6 +12,7 @@ namespace MiniFAIR\PLC;
 use CBOR\ByteStringObject;
 use CBOR\CBORObject;
 use CBOR\Tag;
+use InvalidArgumentException;
 use YOCLIB\Multiformats\Multibase\Multibase;
 
 /**
@@ -53,7 +54,7 @@ final class CIDTag extends Tag {
 
 		// CID data begins with \x01\x71\x12
 		if ( ! str_starts_with( $decoded, "\x01\x71\x12" ) ) {
-			throw new \InvalidArgumentException( 'CID must start with 0x01 0x71 0x12' );
+			throw new InvalidArgumentException( 'CID must start with 0x01 0x71 0x12' );
 		}
 
 		// Prefix with the "Multibase identity prefix" (0x00)

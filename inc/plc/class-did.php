@@ -8,7 +8,6 @@
 namespace MiniFAIR\PLC;
 
 use Exception;
-use MiniFAIR;
 use MiniFAIR\API;
 use MiniFAIR\Keys;
 use MiniFAIR\Keys\Key;
@@ -193,12 +192,12 @@ class DID {
 		$response = wp_remote_post( $url, $opts );
 		if ( is_wp_error( $response ) ) {
 			var_dump( $response );
-			throw new \Exception( 'Error performing operation: ' . $response->get_error_message() );
+			throw new Exception( 'Error performing operation: ' . $response->get_error_message() );
 		}
 		$status = wp_remote_retrieve_response_code( $response );
 		if ( $status !== 200 ) {
 			var_dump( $response );
-			throw new \Exception( 'Error performing operation: ' . wp_remote_retrieve_body( $response ) );
+			throw new Exception( 'Error performing operation: ' . wp_remote_retrieve_body( $response ) );
 		}
 
 		return true;
