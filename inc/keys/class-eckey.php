@@ -1,4 +1,9 @@
 <?php
+/**
+ * ECKey.
+ *
+ * @package MiniFAIR
+ */
 
 namespace MiniFAIR\Keys;
 
@@ -9,7 +14,17 @@ use Elliptic\Utils;
 use Exception;
 use YOCLIB\Multiformats\Multibase\Multibase;
 
+/**
+ * ECKey class.
+ */
 class ECKey implements Key {
+	/**
+	 * Constructor.
+	 *
+	 * @param KeyPair $keypair The keypair.
+	 * @param string  $curve   The curve.
+	 * @return void
+	 */
 	public function __construct(
 		protected KeyPair $keypair,
 		protected string $curve
@@ -30,6 +45,7 @@ class ECKey implements Key {
 	 *
 	 * @see https://atproto.com/specs/cryptography
 	 *
+	 * @throws Exception If the curve is not supported.
 	 * @return string The multibase public key string (starts with z).
 	 */
 	public function encode_public() : string {
@@ -48,6 +64,8 @@ class ECKey implements Key {
 	 *
 	 * @see https://atproto.com/specs/cryptography
 	 *
+	 * @throws Exception If the key is public.
+	 * @throws Exception If the curve is unsupported.
 	 * @return string The multibase private key string (starts with z).
 	 */
 	public function encode_private() : string {
@@ -61,7 +79,7 @@ class ECKey implements Key {
 			CURVE_P256 => bin2hex( PREFIX_CURVE_P256_PRIVATE ),
 			default => throw new Exception( 'Unsupported curve' ),
 		};
-		$encoded = Multibase::encode( Multibase::BASE58BTC, hex2bin( $prefix . $priv ));
+		$encoded = Multibase::encode( Multibase::BASE58BTC, hex2bin( $prefix . $priv ) );
 		return $encoded;
 	}
 
@@ -84,7 +102,7 @@ class ECKey implements Key {
 			CURVE_P256 => bin2hex( PREFIX_CURVE_P256 ),
 			default => throw new Exception( 'Unsupported curve' ),
 		};
-		$encoded = Multibase::encode( Multibase::BASE58BTC, hex2bin( $prefix . $priv ));
+		$encoded = Multibase::encode( Multibase::BASE58BTC, hex2bin( $prefix . $priv ) );
 		return $encoded;
 	}
 
@@ -97,7 +115,7 @@ class ECKey implements Key {
 	 *           we need to do it ourselves. Compact signatures are just the r and
 	 *           s bytes concatenated, but must be padded to 32 bytes each.
 	 *
-	 * @param EC $ec The elliptic curve object.
+	 * @param EC        $ec        The elliptic curve object.
 	 * @param Signature $signature The signature object.
 	 * @return string The compact signature.
 	 */
@@ -110,6 +128,7 @@ class ECKey implements Key {
 	/**
 	 * Sign data using the private key.
 	 *
+	 * @throws Exception If the key is public.
 	 * @param string $data The data to sign, as a hex-encoded string.
 	 * @return string The signature encoded as a binary string.
 	 */
@@ -124,7 +143,7 @@ class ECKey implements Key {
 		 * @var \Elliptic\EC\Signature
 		 */
 		$signature = $this->keypair->sign( $data, 'hex', [
-			'canonical' => true
+			'canonical' => true,
 		] );
 
 		// Convert to compact (IEEE-P1363) form.
@@ -143,6 +162,7 @@ class ECKey implements Key {
 	 * @see https://atproto.com/specs/cryptography
 	 *
 	 * @throws Exception If the curve is not supported.
+	 * @param string $curve The curve.
 	 * @return static The generated keypair object.
 	 */
 	public static function generate( string $curve ) : static {

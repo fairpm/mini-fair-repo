@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<ruleset name="FAIR coding standards">
+	<description>Coding standards for the Mini FAIR Repo plugin</description>
+
+	<!-- Only scan PHP files. -->
+	<arg name="extensions" value="php" />
+
+	<!-- Whenever possible, cache the scan results and re-use those for unchanged files on the next scan. -->
+	<arg name="cache" value=".cache/phpcs.json"/>
+
+	<!-- Path to strip from the front of file paths inside reports (displays shorter paths) -->
+	<arg name="basepath" value="." />
+
+	<!-- Show sniff codes in all reports. -->
+	<arg value="ps"/>
+
+	<!-- Set a minimum PHP version for PHPCompatibility -->
+	<config name="testVersion" value="8.3-" />
+
+	<!-- Set the minimum support WordPress version -->
+	<config name="minimum_supported_wp_version" value="6.4"/>
+
+	<!-- Set the text domain -->
+	<config name="text_domain" value="mini-fair"/>
+
+	<!-- Ignore PHP-related errors. -->
+	<ini name="error_reporting" value="E_ALL &#38; ~E_DEPRECATED" />
+
+	<!-- Use HM Coding Standards -->
+	<rule ref="vendor/humanmade/coding-standards">
+		<!-- Deprecated in PHPCS. Removal in 4.0.0 -->
+		<exclude name="Generic.Functions.CallTimePassByReference" />
+
+		<!-- Scanning CSS/JS files is deprecated in PHPCS. Removal in 4.0.0 -->
+		<exclude name="HM.Debug.ESLint" />
+
+		<!-- Allow use of error_log and var_dump for debugging purposes -->
+		<exclude name="WordPress.PHP.DevelopmentFunctions.error_log_var_dump" />
+
+		<!-- Don't blame the calling code for non-snake case properties. -->
+		<exclude name="WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase" />
+	</rule>
+
+	<!-- Exclude the main plugin file from namespace file rules -->
+	<rule ref="HM.Files.FunctionFileName.WrongFile">
+		<exclude-pattern>plugin\.php</exclude-pattern>
+	</rule>
+
+	<!-- Don't require snake case variable names for JSON-related classes. -->
+	<rule ref="WordPress.NamingConventions.ValidVariableName.VariableNotSnakeCase">
+		<exclude-pattern>inc/plc/class-operation\.php</exclude-pattern>
+		<exclude-pattern>inc/plc/class-signedoperation\.php</exclude-pattern>
+	</rule>
+</ruleset>

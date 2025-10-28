@@ -1,56 +1,53 @@
 <?php
+/**
+ * Operation.
+ *
+ * @package MiniFAIR
+ */
 
 namespace MiniFAIR\PLC;
 
-use MiniFAIR\Keys;
-use MiniFAIR\Keys\Key;
 use Exception;
 use JsonSerializable;
+use MiniFAIR\Keys;
+use MiniFAIR\Keys\Key;
 
+/**
+ * Operation class.
+ */
 class Operation implements JsonSerializable {
+	/**
+	 * Constructor.
+	 *
+	 * @param string                 $type                Operation type (plc_operation or plc_tombstone).
+	 * @param KeyPair[]              $rotationKeys        Rotation keys.
+	 * @param array<string, KeyPair> $verificationMethods Verification keys.
+	 * @param string[]               $alsoKnownAs         Public key.
+	 * @param array<string, string>  $services            Services.
+	 * @param ?string                $prev                Previous operation.
+	 * @return void
+	 */
 	public function __construct(
-		/**
-		 * Operation type (plc_operation or plc_tombstone)
-		 */
 		public string $type,
-
-		/**
-		 * Rotation keys.
-		 *
-		 * @var KeyPair[]
-		 */
 		public array $rotationKeys,
-
-		/**
-		 * Verification keys.
-		 *
-		 * @var array<string, KeyPair>
-		 */
 		public array $verificationMethods,
-
-		/**
-		 * Public key.
-		 *
-		 * @var string[]
-		 */
 		public array $alsoKnownAs,
-
-		/**
-		 * Services.
-		 *
-		 * @var array<string, string>
-		 */
 		public array $services,
-
-		/**
-		 * Previous operation.
-		 *
-		 * @var string|null
-		 */
 		public ?string $prev = null,
 	) {
 	}
 
+	/**
+	 * Validate the operation.
+	 *
+	 * @throws Exception If the operation type is empty.
+	 * @throws Exception If the operation type is invalid.
+	 * @throws Exception If the rotation keys are empty.
+	 * @throws Exception If a rotation key is not an instance of Key.
+	 * @throws Exception If the verification methods are empty.
+	 * @throws Exception If a verification method is invalid.
+	 * @return true True if valid.
+	 */
 	public function validate() : bool {
 		if ( empty( $this->type ) ) {
 			throw new Exception( 'Operation type is empty' );
@@ -93,10 +90,21 @@ class Operation implements JsonSerializable {
 		return true;
 	}
 
+	/**
+	 * Sign the operation.
+	 *
+	 * @param Key $rotation_key Rotation key for signing.
+	 * @return SignedOperation
+	 */
 	public function sign( Key $rotation_key ) : SignedOperation {
 		return sign_operation( $this, $rotation_key );
 	}
 
+	/**
+	 * Return data that should be serialized to JSON.
+	 *
+	 * @return array
+	 */
 	public function jsonSerialize() : array {
 		$methods = [];
 		foreach ( $this->verificationMethods as $key => $keypair ) {

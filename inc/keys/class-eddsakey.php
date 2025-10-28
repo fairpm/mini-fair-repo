@@ -1,4 +1,9 @@
 <?php
+/**
+ * EdDSA Key.
+ *
+ * @package MiniFAIR
+ */
 
 namespace MiniFAIR\Keys;
 
@@ -7,7 +12,17 @@ use Elliptic\EdDSA\KeyPair;
 use Exception;
 use YOCLIB\Multiformats\Multibase\Multibase;
 
+/**
+ * EdDSAKey class.
+ */
 class EdDSAKey implements Key {
+	/**
+	 * Constructor.
+	 *
+	 * @param KeyPair $keypair The keypair.
+	 * @param string  $curve   The curve.
+	 * @return void
+	 */
 	public function __construct(
 		protected KeyPair $keypair,
 		protected string $curve
@@ -26,6 +41,7 @@ class EdDSAKey implements Key {
 	/**
 	 * Sign data using the private key.
 	 *
+	 * @throws Exception If the key is public.
 	 * @param string $data The data to sign, as a hex-encoded string.
 	 * @return string The signature encoded as a hex-encoded string.
 	 */
@@ -102,6 +118,7 @@ class EdDSAKey implements Key {
 	/**
 	 * Generate a new key.
 	 *
+	 * @param string $curve The curve.
 	 * @return static A new instance of the key.
 	 */
 	public static function generate( string $curve ) : static {

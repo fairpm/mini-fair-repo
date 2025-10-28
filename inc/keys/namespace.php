@@ -1,29 +1,34 @@
 <?php
+/**
+ * Key namespace.
+ *
+ * @package MiniFAIR
+ */
 
 namespace MiniFAIR\Keys;
 
 use Exception;
-use Elliptic\EC;
-use Elliptic\EC\KeyPair;
 use YOCLIB\Multiformats\Multibase\Multibase;
 
 const CURVE_K256 = 'secp256k1';
 const CURVE_P256 = 'p256';
 const CURVE_ED25519 = 'ed25519';
 
-// From https://github.com/multiformats/multicodec/blob/master/table.csv:
-// 0xe7 0x01 = varint( 0xe7 ) = 231 = secp256k1-pub
-// 0x80 0x24 = varint( 0x80 ) = 128 = p256-pub
-// 0xed 0x01 = varint( 0xed ) = 237 = ed25519-pub
-// 0x81 0x26 = varint( 0x1301 ) = 4865 = secp256k1-priv
-// 0x86 0x26 = varint( 0x1306 ) = 4870 = p256-priv
-// 0x80 0x26 = varint( 0x1300 ) = 4864 = ed25519-priv
+/*
+ * From https://github.com/multiformats/multicodec/blob/master/table.csv:
+ * 0xe7 0x01 = varint( 0xe7 ) = 231 = secp256k1-pub
+ * 0x80 0x24 = varint( 0x80 ) = 128 = p256-pub
+ * 0xed 0x01 = varint( 0xed ) = 237 = ed25519-pub
+ * 0x81 0x26 = varint( 0x1301 ) = 4865 = secp256k1-priv
+ * 0x86 0x26 = varint( 0x1306 ) = 4870 = p256-priv
+ * 0x80 0x26 = varint( 0x1300 ) = 4864 = ed25519-priv.
+ */
 const PREFIX_CURVE_K256 = "\xe7\x01";
 const PREFIX_CURVE_K256_PRIVATE = "\x81\x26";
 const PREFIX_CURVE_P256 = "\x80\x24";
 const PREFIX_CURVE_P256_PRIVATE = "\x06\x26";
 
-// https://www.w3.org/TR/vc-di-eddsa/#ed25519verificationkey2020
+// https://www.w3.org/TR/vc-di-eddsa/#ed25519verificationkey2020.
 const PREFIX_CURVE_ED25519 = "\xed\x01";
 const PREFIX_CURVE_ED25519_PRIVATE = "\x80\x26"; // 0x1300
 
@@ -110,7 +115,6 @@ function decode_did_key( string $did ) : Key {
  *
  * @throws Exception If the curve is not supported.
  * @param Key $key The keypair object.
- * @param string $curve The curve to use (CURVE_K256 or CURVE_P256).
  * @return string The did:key: string.
  */
 function encode_did_key( Key $key ) : string {

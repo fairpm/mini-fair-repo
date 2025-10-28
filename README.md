@@ -5,8 +5,8 @@ Mini FAIR is designed to allow plugin and theme vendors to host their own FAIR r
 
 We aim to make it possible for everyone to run Mini FAIR, with a focus on ease of use and integration with existing tooling.
 ## Requirements
-- PHP 7.4 or higher
-- WordPress 5.0 or higher
+- PHP 8.3 or higher
+- WordPress 6.4 or higher
 - [Persistant Object Cache](https://developer.wordpress.org/reference/classes/wp_object_cache/#persistent-caching)
 - [Composer](https://getcomposer.org/) for dependency management
 - [Git Updater](https://git-updater.com/) plugin (for integration)
