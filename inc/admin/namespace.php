@@ -186,6 +186,7 @@ function fetch_did( DID $did ) {
  * @return void
  */
 function render_editor() {
+	// phpcs:ignore HM.Security.NonceVerification.Missing -- Nonce verification is handled in on_create().
 	if ( isset( $_POST['action'] ) && $_POST['action'] === ACTION_CREATE ) {
 		on_create();
 	}
@@ -384,7 +385,7 @@ function on_add_key( DID $did ) {
  * @param DID $did The DID.
  */
 function on_revoke_key( DID $did ) {
-	// Handle revoking an existing verification key.
+	// phpcs:ignore HM.Security.NonceVerification.Missing -- Nonce verification has already been performed.
 	$key_id = sanitize_text_field( wp_unslash( $_POST['key_id'] ?? '' ) );
 	if ( empty( $key_id ) ) {
 		wp_die( __( 'No key ID specified.', 'mini-fair' ), '', [ 'response' => 400 ] );
