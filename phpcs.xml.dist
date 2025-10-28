@@ -45,4 +45,10 @@
 	<rule ref="HM.Files.FunctionFileName.WrongFile">
 		<exclude-pattern>plugin\.php</exclude-pattern>
 	</rule>
+
+	<!-- Don't require snake case variable names for JSON-related classes. -->
+	<rule ref="WordPress.NamingConventions.ValidVariableName.VariableNotSnakeCase">
+		<exclude-pattern>inc/plc/class-operation\.php</exclude-pattern>
+		<exclude-pattern>inc/plc/class-signedoperation\.php</exclude-pattern>
+	</rule>
 </ruleset>
