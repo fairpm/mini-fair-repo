@@ -14,6 +14,9 @@ use MiniFAIR\Keys;
 use MiniFAIR\Keys\Key;
 use WP_Post;
 
+/**
+ * DID class.
+ */
 class DID {
 	const DIRECTORY_API = 'https://plc.directory';
 
@@ -22,7 +25,18 @@ class DID {
 	const META_ROTATION_KEYS = 'plc_did_rotation_keys';
 	const META_VERIFICATION_KEYS = 'plc_did_verification_keys';
 
+	/**
+	 * The ID.
+	 *
+	 * @var string
+	 */
 	public readonly string $id;
+
+	/**
+	 * The internal ID.
+	 *
+	 * @var ?int
+	 */
 	protected ?int $internal_id = null;
 
 	/**
@@ -43,6 +57,11 @@ class DID {
 	 */
 	protected array $verification_keys = [];
 
+	/**
+	 * Hash of previous operation, in CID format.
+	 *
+	 * @var ?string
+	 */
 	protected ?string $prev = null;
 
 	/**
@@ -114,6 +133,11 @@ class DID {
 		return $this->internal_id;
 	}
 
+	/**
+	 * Save the DID.
+	 *
+	 * @return void
+	 */
 	public function save() {
 		// If we don't have an internal ID, we need to create a new DID.
 		if ( ! $this->internal_id ) {
@@ -126,6 +150,11 @@ class DID {
 		update_post_meta( $this->internal_id, self::META_VERIFICATION_KEYS, $this->verification_keys );
 	}
 
+	/**
+	 * Create a post for the DID.
+	 *
+	 * @return int
+	 */
 	protected function create_post() {
 		$id = wp_insert_post( [
 			'post_type' => self::POST_TYPE,
@@ -137,6 +166,14 @@ class DID {
 		return $id;
 	}
 
+	/**
+	 * Perform an operation.
+	 *
+	 * @throws Exception If the operation's response is a WP_Error.
+	 * @throws Exception If the operation's response code is not 200.
+	 * @param SignedOperation $op The operation to perform.
+	 * @return true
+	 */
 	protected function perform_operation( SignedOperation $op ) {
 		// Ensure the operation is valid.
 		$op->validate();
@@ -163,6 +200,11 @@ class DID {
 		return true;
 	}
 
+	/**
+	 * Update a DID.
+	 *
+	 * @return ?true True if the operation was performed, otherwise null.
+	 */
 	public function update() {
 		$op = $this->prepare_update_op();
 		if ( ! $op ) {
@@ -174,6 +216,11 @@ class DID {
 		return $this->perform_operation( $op );
 	}
 
+	/**
+	 * Get the expected changes to a DID document.
+	 *
+	 * @return array
+	 */
 	public function get_expected_document() : array {
 		$op = $this->prepare_update_op();
 		if ( ! $op ) {
@@ -198,6 +245,11 @@ class DID {
 		return $verification_keys;
 	}
 
+	/**
+	 * Prepare the update operation.
+	 *
+	 * @return ?SignedOperation
+	 */
 	protected function prepare_update_op() : ?SignedOperation {
 		// Fetch the previous op.
 		$last_op = $this->fetch_last_op();
@@ -331,6 +383,12 @@ class DID {
 	 */
 	protected bool $created = false;
 
+	/**
+	 * Get a DID document.
+	 *
+	 * @param string $id The DID.
+	 * @return ?self
+	 */
 	public static function get( string $id ) {
 		$did = new self();
 		$did->id = $id;
@@ -344,6 +402,12 @@ class DID {
 		return self::from_post( $post );
 	}
 
+	/**
+	 * Get a DID from a post object.
+	 *
+	 * @param WP_Post $post The post object.
+	 * @return self
+	 */
 	public static function from_post( WP_Post $post ) {
 		$did = new self();
 		$did->internal_id = $post->ID;
@@ -354,6 +418,12 @@ class DID {
 		return $did;
 	}
 
+	/**
+	 * Get a DID from its internal ID.
+	 *
+	 * @param int|WP_Post|null $id The internal ID.
+	 * @return ?self
+	 */
 	public static function from_internal_id( $id ) {
 		$post = get_post( $id );
 		if ( ! $post ) {
@@ -363,6 +433,11 @@ class DID {
 		return self::from_post( $post );
 	}
 
+	/**
+	 * Create a DID instance.
+	 *
+	 * @return self
+	 */
 	public static function create() {
 		$did = new self();
 

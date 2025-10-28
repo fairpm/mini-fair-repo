@@ -10,6 +10,9 @@ namespace MiniFAIR;
 use MiniFAIR\PLC\DID;
 use WP_Error;
 
+/**
+ * Provider interface.
+ */
 interface Provider {
 	/**
 	 * Get the active package IDs for this provider.

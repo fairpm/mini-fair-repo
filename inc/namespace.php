@@ -10,11 +10,12 @@ namespace MiniFAIR;
 const CACHE_PREFIX = 'minifair-';
 const CACHE_LIFETIME = 12 * HOUR_IN_SECONDS;
 
-use Exception;
-use MiniFAIR\PLC\DID;
-use WP_Error;
-
-function bootstrap() {
+/**
+ * Bootstrap.
+ *
+ * @return void
+ */
+function bootstrap() : void {
 	Admin\bootstrap();
 	API\bootstrap();
 	Git_Updater\bootstrap();
@@ -22,6 +23,8 @@ function bootstrap() {
 }
 
 /**
+ * Get providers.
+ *
  * @return Provider[]
  */
 function get_providers() : array {
@@ -37,6 +40,11 @@ function get_providers() : array {
 	return $providers;
 }
 
+/**
+ * Get available packages.
+ *
+ * @return string[] Package IDs.
+ */
 function get_available_packages() : array {
 	$packages = [];
 	foreach ( get_providers() as $provider ) {
@@ -46,6 +54,9 @@ function get_available_packages() : array {
 }
 
 /**
+ * Get a package's metadata.
+ *
+ * @param DID $did The DID object.
  * @return API\MetadataDocument|null
  */
 function get_package_metadata( DID $did ) {
@@ -59,9 +70,11 @@ function get_package_metadata( DID $did ) {
 }
 
 /**
- * @param DID $did
- * @param bool $force_regenerate
- * @return bool|null
+ * Update a package's metadata.
+ *
+ * @param DID  $did              The DID object.
+ * @param bool $force_regenerate Optional. Whether to forcibly regenerate the metadata. True to skip cache. Default false.
+ * @return bool|null True on a successful update, false on a failed update, or null if no providers were authoritative for the DID.
  */
 function update_metadata( DID $did, bool $force_regenerate = false ) {
 	foreach ( get_providers() as $provider ) {
@@ -74,9 +87,11 @@ function update_metadata( DID $did, bool $force_regenerate = false ) {
 }
 
 /**
+ * Get a remote URL's response.
+ *
  * @param string $url URL.
- * @param array $opt wp_remote_get options.
- * @return array|WP_Error
+ * @param array  $opt wp_remote_get options.
+ * @return array|WP_Error The response, or a WP_Error object on failure.
  */
 function get_remote_url( $url, $opt = null ) {
 	$opt = $opt ?? [ 'headers' => [ 'Accept' => 'application/did+ld+json' ] ];

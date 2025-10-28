@@ -42,38 +42,37 @@ class CanonicalMapObject extends AbstractCBORObject implements Countable, Iterat
 {
     private const MAJOR_TYPE = self::MAJOR_TYPE_MAP;
 
-    /**
-     * @var MapItem[]
-     */
-    private array $data;
+	/**
+	 * The map data.
+	 *
+	 * @var MapItem[]
+	 */
+	private array $data;
 
-    private ?string $length = null;
+	/**
+	 * The data's length.
+	 *
+	 * @var ?string
+	 */
+	private ?string $length = null;
 
-    /**
-     * @param MapItem[] $data
-     */
-    public function __construct(array $data = [])
-    {
-        [$additionalInformation, $length] = LengthCalculator::getLengthOfArray($data);
-        array_map(static function ($item): void {
-            if (! $item instanceof MapItem) {
-                throw new InvalidArgumentException('The list must contain only MapItem objects.');
-            }
-        }, $data);
+	/**
+	 * Constructor.
+	 *
+	 * @param MapItem[] $data The data for the map.
+	 * @return void
+	 */
 
         parent::__construct(self::MAJOR_TYPE, $additionalInformation);
         $this->data = $data;
         $this->length = $length;
     }
 
-    public function __toString(): string
-    {
-        usort($this->data, function ($a, $b) {
-            $a_key = (string) $a->getKey();
-            $b_key = (string) $b->getKey();
-            if (strlen($a_key) === strlen($b_key) ) {
-                return strcmp($a_key, $b_key);
-            }
+	/**
+	 * Return a string representation of the object.
+	 *
+	 * @return string
+	 */
 
             return strlen($a_key) <=> strlen($b_key);
         });
@@ -94,118 +93,106 @@ class CanonicalMapObject extends AbstractCBORObject implements Countable, Iterat
         return $result;
     }
 
-    /**
-     * @param MapItem[] $data
-     */
-    public static function create(array $data = []): self
-    {
-        return new self($data);
-    }
-
-    public function add(CBORObject $key, CBORObject $value): self
-    {
-        if (! $key instanceof Normalizable) {
-            throw new InvalidArgumentException('Invalid key. Shall be normalizable');
-        }
-        $this->data[$key->normalize()] = MapItem::create($key, $value);
-        [$this->additionalInformation, $this->length] = LengthCalculator::getLengthOfArray($this->data);
-
-        return $this;
-    }
-
-    public function has(int|string $key): bool
-    {
-        return array_key_exists($key, $this->data);
-    }
-
-    public function remove(int|string $index): self
-    {
-        if (! $this->has($index)) {
-            return $this;
-        }
-        unset($this->data[$index]);
-        $this->data = array_values($this->data);
-        [$this->additionalInformation, $this->length] = LengthCalculator::getLengthOfArray($this->data);
+	/**
+	 * Create the object.
+	 *
+	 * @param MapItem[] $data Optional. The map data.
+	 * @return self
+	 */
+	/**
+	 * Add an item to the map.
+	 *
+	 * @throws InvalidArgumentException If the key is not normalizable.
+	 * @param CBORObject $key   The map key.
+	 * @param CBORObject $value The value.
+	 * @return self
+	 */
 
         return $this;
     }
 
-    public function get(int|string $index): CBORObject
-    {
-        if (! $this->has($index)) {
-            throw new InvalidArgumentException('Index not found.');
-        }
-
-        return $this->data[$index]->getValue();
-    }
-
-    public function set(MapItem $object): self
-    {
-        $key = $object->getKey();
-        if (! $key instanceof Normalizable) {
-            throw new InvalidArgumentException('Invalid key. Shall be normalizable');
-        }
-
-        $this->data[$key->normalize()] = $object;
-        [$this->additionalInformation, $this->length] = LengthCalculator::getLengthOfArray($this->data);
+	/**
+	 * Check if the key exists.
+	 *
+	 * @param int|string $key The key.
+	 * @return bool Whether the key exists.
+	 */
+	/**
+	 * Remove an item.
+	 *
+	 * @param int|string $index The key.
+	 * @return self
+	 */
 
         return $this;
     }
 
-    public function count(): int
-    {
-        return count($this->data);
+	/**
+	 * Get an item.
+	 *
+	 * @throws InvalidArgumentException If the key does not exist.
+	 * @param int|string $index The key.
+	 * @return CBORObject The item.
+	 */
+	/**
+	 * Set an item.
+	 *
+	 * @throws InvalidArgumentException If the key is not normalizable.
+	 * @param MapItem $object The object to set.
+	 * @return self
+	 */
+
+        return $this;
     }
 
-    /**
-     * @return Iterator<int, MapItem>
-     */
-    public function getIterator(): Iterator
-    {
-        return new ArrayIterator($this->data);
-    }
+	/**
+	 * Get the number of items.
+	 *
+	 * @return int
+	 */
 
-    /**
-     * @return array<int|string, mixed>
-     */
-    public function normalize(): array
-    {
-        return array_reduce($this->data, static function (array $carry, MapItem $item): array {
-            $key = $item->getKey();
-            if (! $key instanceof Normalizable) {
-                throw new InvalidArgumentException('Invalid key. Shall be normalizable');
-            }
-            $valueObject = $item->getValue();
-            $carry[$key->normalize()] = $valueObject instanceof Normalizable ? $valueObject->normalize() : $valueObject;
+	/**
+	 * Get an iterator of the map data.
+	 *
+	 * @return Iterator<int, MapItem>
+	 */
+
+	/**
+	 * Get normalized map data.
+	 *
+	 * @throws InvalidArgumentException If the key is not normalizable.
+	 * @return array<int|string, mixed>
+	 */
 
             return $carry;
         }, []);
     }
 
-    public function offsetExists($offset): bool
-    {
-        return $this->has($offset);
-    }
-
-    public function offsetGet($offset): CBORObject
-    {
-        return $this->get($offset);
-    }
-
-    public function offsetSet($offset, $value): void
-    {
-        if (! $offset instanceof CBORObject) {
-            throw new InvalidArgumentException('Invalid key');
-        }
-        if (! $value instanceof CBORObject) {
-            throw new InvalidArgumentException('Invalid value');
-        }
-
-        $this->set(MapItem::create($offset, $value));
-    }
-
-    public function offsetUnset($offset): void
-    {
-        $this->remove($offset);
-    }
+	/**
+	 * Check if the key exists.
+	 *
+	 * @param int|string $offset The key.
+	 * @return bool
+	 */
+	/**
+	 * Get an item.
+	 *
+	 * @param int|string $offset The key.
+	 * @return CBORObject The item.
+	 */
+	/**
+	 * Set an item.
+	 *
+	 * @throws InvalidArgumentException If the key is not an instance of CBORObject.
+	 * @throws InvalidArgumentException If the value is not an instance of CBORObject.
+	 * @param CBORObject $offset The key.
+	 * @param CBORObject $value  The value.
+	 * @return void
+	 */
+	/**
+	 * Remove an item.
+	 *
+	 * @param int|string $offset The key.
+	 * @return void
+	 */
 }

@@ -14,10 +14,20 @@ use MiniFAIR\PLC\Util;
 use stdClass;
 use WP_Error;
 
+/**
+ * Bootstrap.
+ *
+ * @return void
+ */
 function bootstrap() : void {
 	add_action( 'plugins_loaded', __NAMESPACE__ . '\\on_load' );
 }
 
+/**
+ * Add hooks on load.
+ *
+ * @return void
+ */
 function on_load() : void {
 	// Only run if Git Updater is active.
 	if ( ! class_exists( 'Fragen\Git_Updater\Bootstrap' ) ) {
@@ -166,6 +176,13 @@ function generate_artifact_metadata( DID $did, string $url, $force_regenerate = 
 	return $next_metadata;
 }
 
+/**
+ * Sign an artifact's data.
+ *
+ * @param Key    $key  The signing key.
+ * @param string $data The artifact's data.
+ * @return string The data's signature.
+ */
 function sign_artifact_data( Key $key, $data ) {
 	// Hash, then sign the hash.
 	$hash = hash( 'sha384', $data, false );

@@ -21,7 +21,11 @@ use YOCLIB\Multiformats\Multibase\Multibase;
 
 const VERIFICATION_METHOD_PREFIX = 'fair_';
 
-function bootstrap() {
+/**
+ * Bootstrap.
+ *
+ * @return void
+ */
 	add_action( 'init', __NAMESPACE__ . '\\register_types' );
 
 	if ( defined( 'WP_CLI' ) && WP_CLI ) {
@@ -29,7 +33,11 @@ function bootstrap() {
 	}
 }
 
-function register_types() {
+/**
+ * Register DID post types.
+ *
+ * @return void
+ */
 	register_post_type( DID::POST_TYPE, [
 		'public' => true,
 		'show_ui' => true,

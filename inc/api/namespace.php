@@ -17,10 +17,20 @@ use WP_Http;
 use WP_REST_Request;
 use WP_REST_Server;
 
+/**
+ * Bootstrap.
+ *
+ * @return void
+ */
 function bootstrap() : void {
 	add_action( 'rest_api_init', __NAMESPACE__ . '\\register_routes' );
 }
 
+/**
+ * Register REST API routes.
+ *
+ * @return void
+ */
 function register_routes() : void {
 	register_rest_route( REST_NAMESPACE, '/packages/(?P<id>did:\w+:[\w-]+)', [
 		'show_in_index' => true,
@@ -54,6 +64,12 @@ function register_routes() : void {
 	] );
 }
 
+/**
+ * Get package data baaed on a REST API request.
+ *
+ * @param WP_REST_Request $request The REST API request.
+ * @return MetadataDocument|WP_Error The package data, or a WP_Error on failure.
+ */
 function get_package_data( WP_REST_Request $request ) {
 	$id = $request->get_param( 'id' );
 
@@ -99,6 +115,11 @@ function get_package_data( WP_REST_Request $request ) {
 	return $response;
 }
 
+/**
+ * Get packages.
+ *
+ * @return array
+ */
 function get_packages() {
 	return array_filter( MiniFAIR\get_available_packages(),
 		function ( $package_did ) {

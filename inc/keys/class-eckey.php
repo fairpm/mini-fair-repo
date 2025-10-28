@@ -14,7 +14,17 @@ use Elliptic\Utils;
 use Exception;
 use YOCLIB\Multiformats\Multibase\Multibase;
 
+/**
+ * ECKey class.
+ */
 class ECKey implements Key {
+	/**
+	 * Constructor.
+	 *
+	 * @param KeyPair $keypair The keypair.
+	 * @param string  $curve   The curve.
+	 * @return void
+	 */
 	public function __construct(
 		protected KeyPair $keypair,
 		protected string $curve

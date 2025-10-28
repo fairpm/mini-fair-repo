@@ -11,9 +11,16 @@ use MiniFAIR\Keys;
 use WP_CLI;
 use WP_CLI_Command;
 
+/**
+ * Command class.
+ */
 class Command extends WP_CLI_Command {
 	/**
 	 * Generate a new DID.
+	 *
+	 * @param array $args       The command line arguments.
+	 * @param array $assoc_args The associative command line arguments.
+	 * @return void
 	 */
 	public function generate( $args, $assoc_args ) {
 		$did = DID::create();
@@ -42,6 +49,13 @@ class Command extends WP_CLI_Command {
 		exit;
 	}
 
+	/**
+	 * Get a DID.
+	 *
+	 * @param array $args       The command line arguments.
+	 * @param array $assoc_args The associative command line arguments.
+	 * @return void
+	 */
 	public function get( $args, $assoc_args ) {
 		$did = DID::get( $args[0] );
 		var_dump( $did );

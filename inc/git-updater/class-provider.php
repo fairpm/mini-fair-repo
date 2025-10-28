@@ -15,6 +15,9 @@ use stdClass;
 use WP_Error;
 use WP_Http;
 
+/**
+ * Provider class.
+ */
 class Provider implements ProviderInterface {
 	const TYPE = 'git-updater';
 
@@ -32,6 +35,11 @@ class Provider implements ProviderInterface {
 		return array_filter( array_map( fn ( $pkg ) => $pkg->did ?? null, $gu_packages ) );
 	}
 
+	/**
+	 * Get the package IDs that have problems.
+	 *
+	 * @return WP_Error[] Map of package ID to WP_Error object. (Use DID as key if available, or some other human-readable identifier.)
+	 */
 	public function get_invalid() : array {
 		$dummy = (object) [];
 		$gu_plugins = Singleton::get_instance( 'Fragen\Git_Updater\Plugin', $dummy )->get_plugin_configs();
@@ -63,6 +71,12 @@ class Provider implements ProviderInterface {
 		return $problems;
 	}
 
+	/**
+	 * Get a package.
+	 *
+	 * @param string $did The DID for the package.
+	 * @return ?stdClass The package data.
+	 */
 	protected function get_package( string $did ) : ?stdClass {
 		$dummy = (object) [];
 		$gu_plugins = Singleton::get_instance( 'Fragen\Git_Updater\Plugin', $dummy )->get_plugin_configs();
@@ -83,6 +97,12 @@ class Provider implements ProviderInterface {
 		return ! empty( $item );
 	}
 
+	/**
+	 * Get the package metadata for a given package ID.
+	 *
+	 * @param DID $did The DID object.
+	 * @return API\MetadataDocument|WP_Error
+	 */
 	public function get_package_metadata( DID $did ) {
 		$package = $this->get_package( $did->id );
 		if ( ! $package ) {
@@ -131,6 +151,13 @@ class Provider implements ProviderInterface {
 		return $data;
 	}
 
+	/**
+	 * Get a package's releases.
+	 *
+	 * @param DID      $did     The DID object.
+	 * @param stdClass $package The package.
+	 * @return array The package's releases.
+	 */
 	protected function get_release_data( DID $did, stdClass $package ) : array {
 		// Requirements.
 		$requires = [];
@@ -237,6 +264,13 @@ class Provider implements ProviderInterface {
 		return $release;
 	}
 
+	/**
+	 * Update a package's metadata.
+	 *
+	 * @param DID  $did              The DID object.
+	 * @param bool $force_regenerate Optional. Whether to forcibly regenerate the metadata. True to skip cache. Default false.
+	 * @return bool Whether the update was successful.
+	 */
 	public function update_metadata( DID $did, bool $force_regenerate = false ) : bool {
 		$package = $this->get_package( $did->id );
 		$repo_api = Singleton::get_instance( 'Fragen\Git_Updater\API\API', $this )->get_repo_api( $package->git, $package );
@@ -251,6 +285,14 @@ class Provider implements ProviderInterface {
 		return true;
 	}
 
+	/**
+	 * Update metadata based on the repository's API response.
+	 *
+	 * @param DID      $did              The DID object.
+	 * @param stdClass $repo_api         The repository's API response.
+	 * @param bool     $force_regenerate Optional. Whether to forcibly regenerate the metadata. True to skip cache. Default false.
+	 * @return ?WP_Error null, or a WP_Error object with one or more errors on failure.
+	 */
 	public function update_metadata_from_repo( DID $did, $repo_api, bool $force_regenerate = false ) : ?WP_Error {
 		$errors = [];
 		$versions = $repo_api->type->release_asset ? $repo_api->type->release_assets : $repo_api->type->tags;

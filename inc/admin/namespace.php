@@ -21,6 +21,11 @@ const ACTION_SYNC = 'sync';
 const NONCE_PREFIX = 'minifair_';
 const PAGE_SLUG = 'minifair';
 
+/**
+ * Bootstrap
+ *
+ * @return void
+ */
 function bootstrap() {
 	// Register the admin menu and page before the PLC DID post type is registered.
 	add_action( 'admin_menu', __NAMESPACE__ . '\\add_admin_menu', 0 );
@@ -44,8 +49,13 @@ function bootstrap() {
 	}, 10, 2 );
 }
 
+/**
+ * Add the admin menu item.
+ *
+ * @return void
+ */
 function add_admin_menu() {
-	// add top level page
+	// add top level page.
 	$hook = add_menu_page(
 		__( 'Mini FAIR', 'minifair' ),
 		__( 'Mini FAIR', 'minifair' ),
@@ -56,9 +66,19 @@ function add_admin_menu() {
 	add_action( 'load-' . $hook, __NAMESPACE__ . '\\load_settings_page' );
 }
 
+/**
+ * Perform actions before the settings page loads.
+ *
+ * @return void
+ */
 function load_settings_page() {
 }
 
+/**
+ * Render the settings page.
+ *
+ * @return void
+ */
 function render_settings_page() {
 	// Check user permissions.
 	if ( ! current_user_can( 'manage_options' ) ) {
@@ -159,6 +179,11 @@ function fetch_did( DID $did ) {
 	return json_decode( $res['body'], true );
 }
 
+/**
+ * Render the editor.
+ *
+ * @return void
+ */
 function render_editor() {
 	if ( isset( $_POST['action'] ) && $_POST['action'] === ACTION_CREATE ) {
 		on_create();
@@ -182,6 +207,11 @@ function render_editor() {
 	}
 }
 
+/**
+ * Create a new PLC DID.
+ *
+ * @return void
+ */
 function on_create() {
 	check_admin_referer( NONCE_PREFIX . ACTION_CREATE );
 
@@ -209,6 +239,12 @@ function on_create() {
 	}
 }
 
+/**
+ * Render the page for creating a new PLC DID.
+ *
+ * @param WP_Post $post The post object.
+ * @return void
+ */
 function render_new_page( WP_Post $post ) {
 	// Check user permissions.
 	if ( ! current_user_can( 'manage_options' ) ) {
@@ -245,6 +281,12 @@ function render_new_page( WP_Post $post ) {
 	<?php
 }
 
+/**
+ * Handle an action for a DID.
+ *
+ * @param int $post_id The post ID to act on.
+ * @return void
+ */
 function handle_action( int $post_id ) {
 	$post = get_post( $post_id );
 	if ( ! $post || $post->post_type !== DID::POST_TYPE ) {
@@ -278,6 +320,12 @@ function handle_action( int $post_id ) {
 	}
 }
 
+/**
+ * Handle syncing a PLC DID with the PLC directory.
+ *
+ * @param DID $did The DID to sync.
+ * @return void
+ */
 function on_sync( DID $did ) {
 	check_admin_referer( NONCE_PREFIX . ACTION_SYNC );
 
@@ -290,6 +338,12 @@ function on_sync( DID $did ) {
 	}
 }
 
+/**
+ * Handle re-signing a DID.
+ *
+ * @param DID $did The DID to re-sign.
+ * @return void
+ */
 function on_resign( DID $did ) {
 	check_admin_referer( NONCE_PREFIX . ACTION_RESIGN );
 
@@ -302,6 +356,12 @@ function on_resign( DID $did ) {
 	}
 }
 
+/**
+ * Handle generating a new verification key for a DID.
+ *
+ * @param DID $did The DID getting the new key.
+ * @return void
+ */
 function on_add_key( DID $did ) {
 	// Handle adding a new verification key.
 	$did->generate_verification_key();
@@ -317,6 +377,11 @@ function on_add_key( DID $did ) {
 	}
 }
 
+/**
+ * Handle revoking an existing verification key.
+ *
+ * @param DID $did The DID.
+ */
 function on_revoke_key( DID $did ) {
 	// Handle revoking an existing verification key.
 	$key_id = $_POST['key_id'] ?? '';
@@ -346,6 +411,12 @@ function on_revoke_key( DID $did ) {
 	}
 }
 
+/**
+ * Render the edit page for a DID.
+ *
+ * @param WP_Post $post The DID's post object.
+ * @return void
+ */
 function render_edit_page( WP_Post $post ) {
 	// Check user permissions.
 	if ( ! current_user_can( 'manage_options' ) ) {

@@ -14,20 +14,39 @@ use CBOR\CBORObject;
 use CBOR\Tag;
 use YOCLIB\Multiformats\Multibase\Multibase;
 
+/**
+ * CIDTag class.
+ */
 final class CIDTag extends Tag {
 	const TAG_CID = 42;
 
+	/**
+	 * Get the tag's ID.
+	 *
+	 * @return int
+	 */
 	public static function getTagId(): int {
 		return self::TAG_CID;
 	}
 
-	public static function createFromLoadedData( int $additionalInformation, ?string $data, CBORObject $object ): Tag
-	{
+	/**
+	 * Create a tag from loaded data.
+	 *
+	 * @param int        $additionalInformation Additional information.
+	 * @param ?string    $data                  The tag data.
+	 * @param CBORObject $object                The tag object.
+	 * @return self
+	 */
 		return new self( $additionalInformation, $data, $object );
 	}
 
-	public static function create( string $cid ): Tag
-	{
+	/**
+	 * Create a tag.
+	 *
+	 * @throws InvalidArgumentException If the CID does not begin with 0x01 0x71 0x12.
+	 * @param string $cid The ID.
+	 * @return Tag
+	 */
 		[ $ai, $data ] = self::determineComponents( self::TAG_CID );
 
 		$decoded = Multibase::decode( $cid );
