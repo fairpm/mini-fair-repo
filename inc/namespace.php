@@ -35,11 +35,7 @@ function get_providers() : array {
 		return $providers;
 	}
 
-	$providers = [
-		Git_Updater\Provider::TYPE => new Git_Updater\Provider(),
-	];
-	$providers = apply_filters( 'minifair.providers', $providers );
-	return $providers;
+	return apply_filters( 'minifair.providers', [] );
 }
 
 /**
