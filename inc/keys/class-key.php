@@ -1,7 +1,15 @@
 <?php
+/**
+ * Key.
+ *
+ * @package MiniFAIR
+ */
 
 namespace MiniFAIR\Keys;
 
+/**
+ * Key interface.
+ */
 interface Key {
 	/**
 	 * Does this key represent a private key?

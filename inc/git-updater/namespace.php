@@ -1,4 +1,9 @@
 <?php
+/**
+ * The Git Updater namespace.
+ *
+ * @package MiniFAIR
+ */
 
 namespace MiniFAIR\Git_Updater;
 
@@ -9,24 +14,35 @@ use MiniFAIR\PLC\Util;
 use stdClass;
 use WP_Error;
 
+/**
+ * Bootstrap.
+ *
+ * @return void
+ */
 function bootstrap() : void {
 	add_action( 'plugins_loaded', __NAMESPACE__ . '\\on_load' );
 }
 
+/**
+ * Add hooks on load.
+ *
+ * @return void
+ */
 function on_load() : void {
 	// Only run if Git Updater is active.
 	if ( ! class_exists( 'Fragen\Git_Updater\Bootstrap' ) ) {
 		return;
 	}
 
-	add_action( 'get_remote_repo_meta', __NAMESPACE__ . '\\update_on_get_remote_meta', 20, 2 ) ;
+	add_action( 'get_remote_repo_meta', __NAMESPACE__ . '\\update_on_get_remote_meta', 20, 2 );
 }
 
 /**
  * Update necessary FAIR data during the Git Updater get_remote_repo_meta().
  *
- * @param stdClass $repo Repository to update.
- * @param object $repo_api Repository API object.
+ * @param stdClass $repo     Repository to update.
+ * @param object   $repo_api Repository API object.
+ * @return void
  */
 function update_on_get_remote_meta( stdClass $repo, $repo_api ) : void {
 	$err = update_fair_data( $repo, $repo_api );
@@ -41,6 +57,8 @@ function update_on_get_remote_meta( stdClass $repo, $repo_api ) : void {
  *
  * Generates metadata for each tag's artifact.
  *
+ * @param stdClass $repo     Repository to update.
+ * @param object   $repo_api Repository API object.
  * @return null|WP_Error Error if one occurred, null otherwise.
  */
 function update_fair_data( $repo, $repo_api ) : ?WP_Error {
@@ -78,7 +96,7 @@ function update_fair_data( $repo, $repo_api ) : ?WP_Error {
 
 	$err = new WP_Error(
 		'minifair.update_fair_data.error',
-		__( 'Error updating FAIR data for repository.', 'minifair' )
+		__( 'Error updating FAIR data for repository.', 'mini-fair' )
 	);
 	foreach ( $errors as $error ) {
 		$err->merge_from( $error );
@@ -99,26 +117,28 @@ function get_artifact_metadata( DID $did, $url ) {
 }
 
 /**
- * @param DID $did
- * @param string $url
- * @param boolean $force_regenerate True to skip cache.
- * @return array|WP_Error
+ * Generate an artifact's metadata.
+ *
+ * @param DID    $did              The DID object.
+ * @param string $url              The artifact's download URL.
+ * @param bool   $force_regenerate Optional. True to skip cache. Default false.
+ * @return array|WP_Error The artifact's metadata, or WP_Error on failure.
  */
 function generate_artifact_metadata( DID $did, string $url, $force_regenerate = false ) {
 	$keys = $did->get_verification_keys();
 	if ( empty( $keys ) ) {
 		return new WP_Error(
 			'minifair.generate_artifact_metadata.missing_keys',
-			__( 'No verification keys found for DID', 'minifair' )
+			__( 'No verification keys found for DID', 'mini-fair' )
 		);
 	}
 
-	// todo: make active key selectable
+	// todo: make active key selectable.
 	$signing_key = end( $keys );
 	if ( empty( $signing_key ) ) {
 		return new WP_Error(
 			'minifair.generate_artifact_metadata.missing_signing_key',
-			__( 'No signing key found for DID', 'minifair' )
+			__( 'No signing key found for DID', 'mini-fair' )
 		);
 	}
 
@@ -146,7 +166,7 @@ function generate_artifact_metadata( DID $did, string $url, $force_regenerate = 
 		// Handle unexpected response code.
 		return new WP_Error(
 			'minifair.artifact.fetch_error',
-			sprintf( __( 'Error fetching artifact: %s', 'minifair' ), $res['response']['code'] ),
+			sprintf( __( 'Error fetching artifact: %s', 'mini-fair' ), $res['response']['code'] ),
 			[ 'status' => $res['response']['code'] ]
 		);
 	}
@@ -161,6 +181,13 @@ function generate_artifact_metadata( DID $did, string $url, $force_regenerate = 
 	return $next_metadata;
 }
 
+/**
+ * Sign an artifact's data.
+ *
+ * @param Key    $key  The signing key.
+ * @param string $data The artifact's data.
+ * @return string The data's signature.
+ */
 function sign_artifact_data( Key $key, $data ) {
 	// Hash, then sign the hash.
 	$hash = hash( 'sha384', $data, false );

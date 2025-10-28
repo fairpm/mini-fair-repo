@@ -1,13 +1,18 @@
 <?php
+/**
+ * PLC namespace.
+ *
+ * @package MiniFAIR
+ */
 
 namespace MiniFAIR\PLC;
 
+use CBOR\OtherObject\NullObject;
 use CBOR\{
 	ListObject,
 	MapItem,
 	TextStringObject,
 };
-use CBOR\OtherObject\NullObject;
 use MiniFAIR\Admin;
 use MiniFAIR\Keys;
 use MiniFAIR\Keys\Key;
@@ -16,7 +21,12 @@ use YOCLIB\Multiformats\Multibase\Multibase;
 
 const VERIFICATION_METHOD_PREFIX = 'fair_';
 
-function bootstrap() {
+/**
+ * Bootstrap.
+ *
+ * @return void
+ */
+function bootstrap() : void {
 	add_action( 'init', __NAMESPACE__ . '\\register_types' );
 
 	if ( defined( 'WP_CLI' ) && WP_CLI ) {
@@ -24,22 +34,27 @@ function bootstrap() {
 	}
 }
 
-function register_types() {
+/**
+ * Register DID post types.
+ *
+ * @return void
+ */
+function register_types() : void {
 	register_post_type( DID::POST_TYPE, [
 		'public' => true,
 		'show_ui' => true,
 		'show_in_menu' => Admin\PAGE_SLUG,
 		'supports' => [ 'title', 'editor', 'custom-fields' ],
-		'label' => __( 'PLC DIDs', 'minifair' ),
+		'label' => __( 'PLC DIDs', 'mini-fair' ),
 		'labels' => [
-			'menu_name' => __( 'PLC DIDs', 'minifair' ),
-			'singular_name' => __( 'PLC DID', 'minifair' ),
-			'add_new_item' => __( 'Add New PLC DID', 'minifair' ),
-			'edit_item' => __( 'Edit PLC DID', 'minifair' ),
-			'all_items' => __( 'All PLC DIDs', 'minifair' ),
-			'search_items' => __( 'Search PLC DIDs', 'minifair' ),
-			'not_found' => __( 'No PLC DIDs found', 'minifair' ),
-			'not_found_in_trash' => __( 'No PLC DIDs found in Trash', 'minifair' ),
+			'menu_name' => __( 'PLC DIDs', 'mini-fair' ),
+			'singular_name' => __( 'PLC DID', 'mini-fair' ),
+			'add_new_item' => __( 'Add New PLC DID', 'mini-fair' ),
+			'edit_item' => __( 'Edit PLC DID', 'mini-fair' ),
+			'all_items' => __( 'All PLC DIDs', 'mini-fair' ),
+			'search_items' => __( 'Search PLC DIDs', 'mini-fair' ),
+			'not_found' => __( 'No PLC DIDs found', 'mini-fair' ),
+			'not_found_in_trash' => __( 'No PLC DIDs found in Trash', 'mini-fair' ),
 		],
 	] );
 }
@@ -48,7 +63,7 @@ function register_types() {
  * Sign an operation.
  *
  * @param Operation $data The operation to sign.
- * @param Key $signing_key The signing key.
+ * @param Key       $key  The signing key.
  * @return SignedOperation The signed operation.
  */
 function sign_operation( Operation $data, Key $key ) : SignedOperation {
@@ -167,19 +182,19 @@ function cid_for_operation( SignedOperation $op ) : string {
 	$hash = hash( 'sha256', $cbor, true );
 
 	// The bit layout for CIDs is:
-	// Version (CIDv1 = 0x01)
+	// Version (CIDv1 = 0x01).
 	$cid = "\x01";
 
-	// Type (dag-cbor = 0x71)
+	// Type (dag-cbor = 0x71).
 	$cid .= "\x71";
 
-	// Multihash type (sha-256 = 0x12)
-	$cid .= "\x12"; // sha-256
+	// Multihash type (sha-256 = 0x12).
+	$cid .= "\x12"; // sha-256.
 
-	// Multihash length
+	// Multihash length.
 	$cid .= pack( 'C', strlen( $hash ) );
 
-	// Hash digest
+	// Hash digest.
 	$cid .= $hash;
 
 	// Then, encode to base32 multibase.
