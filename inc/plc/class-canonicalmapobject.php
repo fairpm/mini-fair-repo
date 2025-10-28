@@ -5,6 +5,8 @@
  * @package MiniFAIR
  */
 
+// phpcs:disable HM.Files.NamespaceDirectoryName.NameMismatch -- Avoids a bug which detects strict_types as the namespace.
+
 declare(strict_types=1);
 
 namespace MiniFAIR\PLC;
