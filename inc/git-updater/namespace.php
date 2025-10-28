@@ -35,8 +35,8 @@ function on_load() : void {
 		return;
 	}
 
-	add_filter( 'minifair.providers', __NAMESPACE__ . '\\register_provider' ) ;
-	add_action( 'get_remote_repo_meta', __NAMESPACE__ . '\\update_on_get_remote_meta', 20, 2 ) ;
+	add_filter( 'minifair.providers', __NAMESPACE__ . '\\register_provider' );
+	add_action( 'get_remote_repo_meta', __NAMESPACE__ . '\\update_on_get_remote_meta', 20, 2 );
 }
 
 /**
@@ -46,9 +46,9 @@ function on_load() : void {
  * @return array<string, ProviderInterface>
  */
 function register_provider( array $providers ): array {
-    return array_merge( $providers, [
-        Provider::TYPE => new Provider(),
-    ] );
+	return array_merge( $providers, [
+		Provider::TYPE => new Provider(),
+	] );
 }
 
 /**
