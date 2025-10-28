@@ -43,7 +43,6 @@ function on_load() : void {
  * Register the Git Updater provider.
  *
  * @param array<string, ProviderInterface> $providers The previously registered providers.
- *
  * @return array<string, ProviderInterface>
  */
 function register_provider( array $providers ): array {
