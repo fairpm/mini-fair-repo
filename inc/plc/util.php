@@ -1,4 +1,9 @@
 <?php
+/**
+ * PLC utilities.
+ *
+ * @package MiniFAIR
+ */
 
 namespace MiniFAIR\PLC\Util;
 
@@ -39,37 +44,37 @@ function base64url_decode( string $data ) : string {
  * @copyright 2016 Denis Borzenko
  * @license https://github.com/bbars/utils/blob/master/LICENSE MIT
  * @see https://github.com/bbars/utils
+ *
+ * @param string $data The data to encode.
+ * @param bool   $pad_right whether to pad the encoded string with equals (=) characters.
+ * @return string The encoded string.
  */
-function base32_encode($data, $padRight = false) {
-	$dataSize = strlen($data);
+function base32_encode( $data, $pad_right = false ) {
+	$data_size = strlen( $data );
 	$res = '';
 	$remainder = 0;
-	$remainderSize = 0;
+	$remainder_size = 0;
 
-	for ($i = 0; $i < $dataSize; $i++)
-	{
-		$b = ord($data[$i]);
-		$remainder = ($remainder << 8) | $b;
-		$remainderSize += 8;
-		while ($remainderSize > 4)
-		{
-			$remainderSize -= 5;
-			$c = $remainder & (BASE32_BITS_5_RIGHT << $remainderSize);
-			$c >>= $remainderSize;
-			$res .= BASE32_CHARS[$c];
+	for ( $i = 0; $i < $data_size; $i++ ) {
+		$b = ord( $data[ $i ] );
+		$remainder = ( $remainder << 8 ) | $b;
+		$remainder_size += 8;
+		while ( $remainder_size > 4 ) {
+			$remainder_size -= 5;
+			$c = $remainder & ( BASE32_BITS_5_RIGHT << $remainder_size );
+			$c >>= $remainder_size;
+			$res .= BASE32_CHARS[ $c ];
 		}
 	}
-	if ($remainderSize > 0)
-	{
-		// remainderSize < 5:
-		$remainder <<= (5 - $remainderSize);
+	if ( $remainder_size > 0 ) {
+		// remainder_size < 5.
+		$remainder <<= ( 5 - $remainder_size );
 		$c = $remainder & BASE32_BITS_5_RIGHT;
-		$res .= BASE32_CHARS[$c];
+		$res .= BASE32_CHARS[ $c ];
 	}
-	if ($padRight)
-	{
-		$padSize = (8 - ceil(($dataSize % 5) * 8 / 5)) % 8;
-		$res .= str_repeat('=', $padSize);
+	if ( $pad_right ) {
+		$pad_size = ( 8 - ceil( ( $data_size % 5 ) * 8 / 5 ) ) % 8;
+		$res .= str_repeat( '=', $pad_size );
 	}
 	return $res;
 }
@@ -80,33 +85,35 @@ function base32_encode($data, $padRight = false) {
  * @copyright 2016 Denis Borzenko
  * @license https://github.com/bbars/utils/blob/master/LICENSE MIT
  * @see https://github.com/bbars/utils
+ *
+ * @throws Exception If the encoded string contains an unsupported character.
+ * @param string $data The encoded string.
+ * @return string The decoded string.
  */
-function base32_decode($data) {
-	$data = rtrim($data, "=\x20\t\n\r\0\x0B");
-	$dataSize = strlen($data);
+function base32_decode( $data ) {
+	$data = rtrim( $data, "=\x20\t\n\r\0\x0B" );
+	$data_size = strlen( $data );
 	$buf = 0;
-	$bufSize = 0;
+	$buf_size = 0;
 	$res = '';
-	$charMap = array_flip(str_split(BASE32_CHARS)); // char=>value map
-	$charMap += array_flip(str_split(strtoupper(BASE32_CHARS))); // add upper-case alternatives
+	$char_map = array_flip( str_split( BASE32_CHARS ) ); // char=>value map.
+	$char_map += array_flip( str_split( strtoupper( BASE32_CHARS ) ) ); // add upper-case alternatives.
 
-	for ($i = 0; $i < $dataSize; $i++)
-	{
-		$c = $data[$i];
-		if (!isset($charMap[$c]))
-		{
-			if ($c == " " || $c == "\r" || $c == "\n" || $c == "\t")
-				continue; // ignore these safe characters
-			throw new Exception('Encoded string contains unexpected char #'.ord($c)." at offset $i (using improper alphabet?)");
+	for ( $i = 0; $i < $data_size; $i++ ) {
+		$c = $data[ $i ];
+		if ( ! isset( $char_map[ $c ] ) ) {
+			if ( $c === ' ' || $c === "\r" || $c === "\n" || $c === "\t" ) {
+				continue; // ignore these safe characters.
+			}
+			throw new Exception( 'Encoded string contains unexpected char #' . ord( $c ) . " at offset $i (using improper alphabet?)" );
 		}
-		$b = $charMap[$c];
-		$buf = ($buf << 5) | $b;
-		$bufSize += 5;
-		if ($bufSize > 7)
-		{
-			$bufSize -= 8;
-			$b = ($buf & (0xff << $bufSize)) >> $bufSize;
-			$res .= chr($b);
+		$b = $char_map[ $c ];
+		$buf = ( $buf << 5 ) | $b;
+		$buf_size += 5;
+		if ( $buf_size > 7 ) {
+			$buf_size -= 8;
+			$b = ( $buf & ( 0xff << $buf_size ) ) >> $buf_size;
+			$res .= chr( $b );
 		}
 	}
 
