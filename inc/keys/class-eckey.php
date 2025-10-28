@@ -79,7 +79,7 @@ class ECKey implements Key {
 			CURVE_P256 => bin2hex( PREFIX_CURVE_P256_PRIVATE ),
 			default => throw new Exception( 'Unsupported curve' ),
 		};
-		$encoded = Multibase::encode( Multibase::BASE58BTC, hex2bin( $prefix . $priv ));
+		$encoded = Multibase::encode( Multibase::BASE58BTC, hex2bin( $prefix . $priv ) );
 		return $encoded;
 	}
 
@@ -102,7 +102,7 @@ class ECKey implements Key {
 			CURVE_P256 => bin2hex( PREFIX_CURVE_P256 ),
 			default => throw new Exception( 'Unsupported curve' ),
 		};
-		$encoded = Multibase::encode( Multibase::BASE58BTC, hex2bin( $prefix . $priv ));
+		$encoded = Multibase::encode( Multibase::BASE58BTC, hex2bin( $prefix . $priv ) );
 		return $encoded;
 	}
 
@@ -143,7 +143,7 @@ class ECKey implements Key {
 		 * @var \Elliptic\EC\Signature
 		 */
 		$signature = $this->keypair->sign( $data, 'hex', [
-			'canonical' => true
+			'canonical' => true,
 		] );
 
 		// Convert to compact (IEEE-P1363) form.

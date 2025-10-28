@@ -100,8 +100,7 @@ class DID {
 					return false;
 				}
 				$encoded = $legacy_encoded;
-			}
-			else {
+			} else {
 				return false;
 			}
 		}
@@ -309,7 +308,7 @@ class DID {
 		$response = wp_remote_get( $url, [
 			'headers' => [
 				'Accept' => 'application/did+ld+json',
-			]
+			],
 		] );
 		if ( is_wp_error( $response ) ) {
 			throw new Exception( 'Error fetching last op: ' . $response->get_error_message() );
@@ -347,7 +346,7 @@ class DID {
 		$response = wp_remote_get( $url, [
 			'headers' => [
 				'Accept' => 'application/did+ld+json',
-			]
+			],
 		] );
 		if ( is_wp_error( $response ) ) {
 			return false;
@@ -372,7 +371,7 @@ class DID {
 		$response = wp_remote_get( $url, [
 			'headers' => [
 				'Accept' => 'application/did+ld+json',
-			]
+			],
 		] );
 		if ( is_wp_error( $response ) ) {
 			return false;

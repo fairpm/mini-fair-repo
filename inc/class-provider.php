@@ -52,3 +52,4 @@ interface Provider {
 	 */
 	public function get_release( DID $did, string $version );
 }
+

@@ -135,15 +135,8 @@ class Provider implements ProviderInterface {
 		// Parse link back out of author string.
 		$data->authors[] = [
 			'name' => $package->author,
-			'url' => $package->author_uri ??  '',
+			'url' => $package->author_uri ?? '',
 		];
-		//foreach ( $package->contributors as $contributor ) {
-		//	$data->authors[] = [
-		//		'name' => $contributor['display_name'],
-		//		'url' => $contributor['profile'],
-		//	];
-		//}
-		$data->last_updated = $package->last_updated ?? '';
 
 		// Releases.
 		$data->releases = $this->get_release_data( $did, $package );
@@ -195,7 +188,7 @@ class Provider implements ProviderInterface {
 			'banner' => $package->banners,
 			'icon' => $package->icons,
 		];
-		foreach( $other_assets as $key => $asset ) {
+		foreach ( $other_assets as $key => $asset ) {
 			foreach ( $asset as $asset_id => $url ) {
 				if ( $key === 'icon' && $asset_id === 'default' && count( $asset ) > 1 ) {
 					continue;
@@ -279,7 +272,7 @@ class Provider implements ProviderInterface {
 
 		$err = $this->update_metadata_from_repo( $did, $repo_api, $force_regenerate );
 		if ( is_wp_error( $err ) ) {
-			var_dump('err!');
+			var_dump( 'err!' );
 			var_dump( $err );
 			exit;
 			return false;

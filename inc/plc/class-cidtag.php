@@ -49,6 +49,7 @@ final class CIDTag extends Tag {
 	 * @param string $cid The ID.
 	 * @return Tag
 	 */
+	public static function create( string $cid ): Tag {
 		[ $ai, $data ] = self::determineComponents( self::TAG_CID );
 
 		$decoded = Multibase::decode( $cid );

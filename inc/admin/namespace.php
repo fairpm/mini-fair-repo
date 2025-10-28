@@ -96,14 +96,16 @@ function render_settings_page() {
 	<div class="wrap">
 		<h1><?php esc_html_e( 'Mini FAIR', 'mini-fair' ); ?></h1>
 
-		<p><?php
+		<p>
+		<?php
 			printf(
 				__( 'Mini FAIR is active on your site. View your active packages at <a href="%1$s"><code>%1$s</code></a>', 'mini-fair' ),
-				rest_url( '/minifair/v1/packages' )
+				esc_url( rest_url( '/minifair/v1/packages' ) )
 			);
-		?></p>
+		?>
+		</p>
 
-		<h2><?php esc_html_e( 'Active Packages', 'minifair' ); ?></h2>
+		<h2><?php esc_html_e( 'Active Packages', 'mini-fair' ); ?></h2>
 		<table class="wp-list-table widefat fixed striped">
 			<thead>
 				<tr>
@@ -171,7 +173,7 @@ function fetch_did( DID $did ) {
 	$res = wp_remote_get( $url, [
 		'headers' => [
 			'Accept' => 'application/did+ld+json',
-		]
+		],
 	] );
 	if ( is_wp_error( $res ) ) {
 		return $res;
@@ -260,7 +262,7 @@ function render_new_page( WP_Post $post ) {
 	<form action="" method="post">
 		<?php wp_nonce_field( NONCE_PREFIX . ACTION_CREATE ) ?>
 		<input type="hidden" name="post" value="<?php echo esc_attr( $post->ID ); ?>" />
-		<input type="hidden" name="action" value="<?= esc_attr( ACTION_CREATE ) ?>" />
+		<input type="hidden" name="action" value="<?= esc_attr( ACTION_CREATE ); ?>" />
 
 		<table class="form-table">
 			<!-- <tr>
@@ -463,7 +465,8 @@ function render_edit_page( WP_Post $post ) {
 					<?php
 					$verification_keys = $did->get_verification_keys();
 					$last = end( $verification_keys );
-					foreach ( $verification_keys as $key ) : ?>
+					foreach ( $verification_keys as $key ) :
+						?>
 						<?php
 						$public = $key->encode_public();
 						$id = substr( hash( 'sha256', $public ), 0, 6 );
@@ -474,7 +477,7 @@ function render_edit_page( WP_Post $post ) {
 							<?php if ( $key instanceof Keys\ECKey ) : ?>
 								<p><small><em>(Key is using outdated algorithm and should be replaced.)</em></small></p>
 							<?php endif; ?>
-							<?php if ( $key === $last ): ?>
+							<?php if ( $key === $last ) : ?>
 								<p><small><strong>Current</strong></small></p>
 							<?php endif; ?>
 
@@ -497,7 +500,8 @@ function render_edit_page( WP_Post $post ) {
 									'revoke_verification_key',
 									true,
 									$disabled
-								); ?>
+								);
+								?>
 							</form>
 						</li>
 					<?php endforeach; ?>
@@ -551,7 +555,7 @@ function render_edit_page( WP_Post $post ) {
 				<form action="" method="post">
 					<?php wp_nonce_field( NONCE_PREFIX . ACTION_SYNC ); ?>
 					<input type="hidden" name="post" value="<?php echo esc_attr( $post->ID ); ?>" />
-					<input type="hidden" name="action" value="<?= esc_attr( ACTION_SYNC ) ?>" />
+					<input type="hidden" name="action" value="<?= esc_attr( ACTION_SYNC ); ?>" />
 					<?php submit_button( __( 'Sync to PLC Directory', 'mini-fair' ), 'primary', 'update_did' ); ?>
 				</form>
 			</td>

@@ -34,7 +34,7 @@ function on_load() : void {
 		return;
 	}
 
-	add_action( 'get_remote_repo_meta', __NAMESPACE__ . '\\update_on_get_remote_meta', 20, 2 ) ;
+	add_action( 'get_remote_repo_meta', __NAMESPACE__ . '\\update_on_get_remote_meta', 20, 2 );
 }
 
 /**
