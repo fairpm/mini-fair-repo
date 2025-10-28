@@ -35,9 +35,7 @@ function get_providers() : array {
 		return $providers;
 	}
 
-	$providers = apply_filters( 'minifair.providers', [] );
-
-	return $providers;
+	return apply_filters( 'minifair.providers', [] );
 }
 
 /**
