@@ -1,4 +1,9 @@
 <?php
+/**
+ * ECKey.
+ *
+ * @package MiniFAIR
+ */
 
 namespace MiniFAIR\Keys;
 

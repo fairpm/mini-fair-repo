@@ -1,4 +1,9 @@
 <?php
+/**
+ * Key namespace.
+ *
+ * @package MiniFAIR
+ */
 
 namespace MiniFAIR\Keys;
 

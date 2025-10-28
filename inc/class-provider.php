@@ -1,4 +1,9 @@
 <?php
+/**
+ * Provider.
+ *
+ * @package MiniFAIR
+ */
 
 namespace MiniFAIR;
 

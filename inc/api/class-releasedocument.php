@@ -1,4 +1,9 @@
 <?php
+/**
+ * Release Document.
+ *
+ * @package MiniFAIR
+ */
 
 namespace MiniFAIR\API;
 

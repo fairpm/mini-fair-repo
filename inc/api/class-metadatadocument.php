@@ -1,4 +1,9 @@
 <?php
+/**
+ * Metadata Document.
+ *
+ * @package MiniFAIR
+ */
 
 namespace MiniFAIR\API;
 

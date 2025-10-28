@@ -1,4 +1,9 @@
 <?php
+/**
+ * The Git Updater namespace.
+ *
+ * @package MiniFAIR
+ */
 
 namespace MiniFAIR\Git_Updater;
 

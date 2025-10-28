@@ -1,4 +1,9 @@
 <?php
+/**
+ * CID Tag.
+ *
+ * @package MiniFAIR
+ */
 
 declare(strict_types=1);
 

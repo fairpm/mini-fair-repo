@@ -1,4 +1,9 @@
 <?php
+/**
+ * Plugin namespace.
+ *
+ * @package MiniFAIR
+ */
 
 namespace MiniFAIR;
 

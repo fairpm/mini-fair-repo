@@ -1,4 +1,9 @@
 <?php
+/**
+ * The administration namespace.
+ *
+ * @package MiniFAIR
+ */
 
 namespace MiniFAIR\Admin;
 

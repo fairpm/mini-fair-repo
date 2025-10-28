@@ -1,4 +1,9 @@
 <?php
+/**
+ * Canonical map object.
+ *
+ * @package MiniFAIR
+ */
 
 declare(strict_types=1);
 

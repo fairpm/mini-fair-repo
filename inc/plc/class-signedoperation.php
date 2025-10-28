@@ -1,4 +1,9 @@
 <?php
+/**
+ * Signed operation.
+ *
+ * @package MiniFAIR
+ */
 
 namespace MiniFAIR\PLC;
 

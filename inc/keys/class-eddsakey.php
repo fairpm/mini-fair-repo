@@ -1,4 +1,9 @@
 <?php
+/**
+ * EdDSA Key.
+ *
+ * @package MiniFAIR
+ */
 
 namespace MiniFAIR\Keys;
 

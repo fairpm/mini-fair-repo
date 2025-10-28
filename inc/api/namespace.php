@@ -1,4 +1,9 @@
 <?php
+/**
+ * The API namespace.
+ *
+ * @package MiniFAIR
+ */
 
 namespace MiniFAIR\API;
 

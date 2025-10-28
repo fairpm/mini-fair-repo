@@ -1,4 +1,9 @@
 <?php
+/**
+ * PLC utilities.
+ *
+ * @package MiniFAIR
+ */
 
 namespace MiniFAIR\PLC\Util;
 

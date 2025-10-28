@@ -1,4 +1,9 @@
 <?php
+/**
+ * PLC namespace.
+ *
+ * @package MiniFAIR
+ */
 
 namespace MiniFAIR\PLC;
 
