@@ -27,7 +27,7 @@ class Command extends WP_CLI_Command {
 
 		printf(
 			"DID:              %s\n",
-			$did->id
+			esc_html( $did->id )
 		);
 
 		$rot_keys = $did->get_rotation_keys();
@@ -35,7 +35,7 @@ class Command extends WP_CLI_Command {
 			$encoded = $key->encode_public();
 			printf(
 				"Rotation key:     %s\n",
-				$encoded
+				esc_html( $encoded )
 			);
 		}
 		$verif_keys = $did->get_verification_keys();
@@ -43,7 +43,7 @@ class Command extends WP_CLI_Command {
 			$encoded = $key->encode_public();
 			printf(
 				"Verification key: %s\n",
-				$encoded
+				esc_html( $encoded )
 			);
 		}
 		exit;
@@ -62,7 +62,7 @@ class Command extends WP_CLI_Command {
 
 		printf(
 			"DID:              %s\n",
-			$did->id
+			esc_html( $did->id )
 		);
 
 		$rot_keys = $did->get_rotation_keys();
@@ -70,7 +70,7 @@ class Command extends WP_CLI_Command {
 			$encoded = $key->encode_public();
 			printf(
 				"Rotation key:     %s\n",
-				$encoded
+				esc_html( $encoded )
 			);
 		}
 		$verif_keys = $did->get_verification_keys();
@@ -78,7 +78,7 @@ class Command extends WP_CLI_Command {
 			$encoded = $key->encode_public();
 			printf(
 				"Verification key: %s\n",
-				$encoded
+				esc_html( $encoded )
 			);
 		}
 	}

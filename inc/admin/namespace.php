@@ -122,7 +122,7 @@ function render_settings_page() {
 						$data = MiniFAIR\get_package_metadata( $did );
 						?>
 						<td><code><?php echo esc_html( $package_id ); ?></code>
-							<a href="<?php echo get_edit_post_link( $did->get_internal_post_id() ) ?>"><?php esc_html_e( '(View DID)', 'mini-fair' ) ?></a></td>
+							<a href="<?php echo esc_url( get_edit_post_link( $did->get_internal_post_id() ) ) ?>"><?php esc_html_e( '(View DID)', 'mini-fair' ) ?></a></td>
 						<td><?php echo esc_html( $data->name ); ?></td>
 					</tr>
 				<?php endforeach; ?>
@@ -293,7 +293,7 @@ function handle_action( int $post_id ) {
 		return;
 	}
 
-	$action = $_REQUEST['action'] ?? '';
+	$action = sanitize_text_field( wp_unslash( $_REQUEST['action'] ?? '' ) );
 	if ( empty( $action ) ) {
 		// This should never occur, since we're hooked into specific actions above.
 		wp_die( __( 'No action specified.', 'mini-fair' ), '', [ 'response' => 400 ] );
@@ -334,7 +334,7 @@ function on_sync( DID $did ) {
 		wp_redirect( get_edit_post_link( $did->get_internal_post_id(), 'raw' ) );
 		exit;
 	} catch ( \Exception $e ) {
-		wp_die( $e->getMessage(), __( 'Error Syncing PLC DID', 'mini-fair' ), [ 'response' => 500 ] );
+		wp_die( esc_html( $e->getMessage() ), __( 'Error Syncing PLC DID', 'mini-fair' ), [ 'response' => 500 ] );
 	}
 }
 
@@ -352,7 +352,7 @@ function on_resign( DID $did ) {
 		wp_redirect( get_edit_post_link( $did->get_internal_post_id(), 'raw' ) );
 		exit;
 	} catch ( \Exception $e ) {
-		wp_die( $e->getMessage(), __( 'Error Regenerating Signatures', 'mini-fair' ), [ 'response' => 500 ] );
+		wp_die( esc_html( $e->getMessage() ), __( 'Error Regenerating Signatures', 'mini-fair' ), [ 'response' => 500 ] );
 	}
 }
 
@@ -373,7 +373,7 @@ function on_add_key( DID $did ) {
 		exit;
 	} catch ( \Exception $e ) {
 		var_dump( $e );
-		wp_die( $e->getMessage(), __( 'Error Syncing PLC DID', 'mini-fair' ), [ 'response' => 500 ] );
+		wp_die( esc_html( $e->getMessage() ), __( 'Error Syncing PLC DID', 'mini-fair' ), [ 'response' => 500 ] );
 	}
 }
 
@@ -384,7 +384,7 @@ function on_add_key( DID $did ) {
  */
 function on_revoke_key( DID $did ) {
 	// Handle revoking an existing verification key.
-	$key_id = $_POST['key_id'] ?? '';
+	$key_id = sanitize_text_field( wp_unslash( $_POST['key_id'] ?? '' ) );
 	if ( empty( $key_id ) ) {
 		wp_die( __( 'No key ID specified.', 'mini-fair' ), '', [ 'response' => 400 ] );
 	}
@@ -407,7 +407,7 @@ function on_revoke_key( DID $did ) {
 		exit;
 	} catch ( Exception $e ) {
 		var_dump( $e );
-		wp_die( $e->getMessage(), __( 'Error Syncing PLC DID', 'mini-fair' ), [ 'response' => 500 ] );
+		wp_die( esc_html( $e->getMessage() ), __( 'Error Syncing PLC DID', 'mini-fair' ), [ 'response' => 500 ] );
 	}
 }
 
@@ -518,7 +518,7 @@ function render_edit_page( WP_Post $post ) {
 					<?php
 					printf(
 						__( 'Current DID Document in the <a href="%s">PLC Directory</a>.', 'mini-fair' ),
-						'https://web.plc.directory/did/' . $did->id
+						esc_url( 'https://web.plc.directory/did/' . $did->id )
 					);
 					?>
 				</p>
@@ -542,7 +542,7 @@ function render_edit_page( WP_Post $post ) {
 					if ( empty( $diff ) ) {
 						echo '<p class="description">' . esc_html__( 'No changes detected. The PLC Directory is already up to date.', 'mini-fair' ) . '</p>';
 					} else {
-						echo '<div class="diff">' . $diff . '</div>';
+						echo '<div class="diff">' . esc_html( $diff ) . '</div>';
 					}
 					?>
 				</details>
