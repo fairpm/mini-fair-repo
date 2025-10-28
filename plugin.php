@@ -5,7 +5,7 @@
  * Version: 0.1
  * Author: FAIR Contributors
  * License: GPLv2
- * Requires at least: 5.0
+ * Requires at least: 6.4
  * Requires PHP: 8.3
  * Text Domain: mini-fair
  */
