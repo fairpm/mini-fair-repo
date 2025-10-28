@@ -119,7 +119,7 @@ class Provider implements ProviderInterface {
 		$data->name = $package->name;
 		$data->slug = $package->slug;
 		$data->filename = $package->file;
-		$data->description = substr( strip_tags( trim( $package->sections['description'] ) ), 0, 139 ) . '…';
+		$data->description = substr( wp_strip_all_tags( trim( $package->sections['description'] ) ), 0, 139 ) . '…';
 
 		// Parse security data.
 		$data->security = [];
