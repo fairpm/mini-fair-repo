@@ -138,6 +138,8 @@ class Provider implements ProviderInterface {
 			'url' => $package->author_uri ?? '',
 		];
 
+		$data->last_updated = $package->last_updated ?? '';
+
 		// Releases.
 		$data->releases = $this->get_release_data( $did, $package );
 
