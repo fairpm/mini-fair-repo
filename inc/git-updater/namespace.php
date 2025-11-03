@@ -11,7 +11,6 @@ use MiniFAIR;
 use MiniFAIR\Keys\Key;
 use MiniFAIR\PLC\DID;
 use MiniFAIR\PLC\Util;
-use MiniFAIR\Provider as ProviderInterface;
 use stdClass;
 use WP_Error;
 
