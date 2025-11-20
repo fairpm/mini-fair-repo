@@ -292,10 +292,6 @@ function render_new_page( WP_Post $post ) {
  * @return void
  */
 function handle_action( int $post_id ) {
-	if ( ! current_user_can( 'manage_options' ) ) {
-		wp_die( __( 'You do not have sufficient permissions to access this page.', 'mini-fair' ) );
-	}
-
 	$post = get_post( $post_id );
 	if ( ! $post || $post->post_type !== DID::POST_TYPE ) {
 		return;
@@ -335,6 +331,10 @@ function handle_action( int $post_id ) {
  * @return void
  */
 function on_sync( DID $did ) {
+	if ( ! current_user_can( 'manage_options' ) ) {
+		wp_die( __( 'You do not have sufficient permissions to access this function.', 'mini-fair' ) );
+	}
+
 	check_admin_referer( NONCE_PREFIX . ACTION_SYNC );
 
 	try {
@@ -353,6 +353,10 @@ function on_sync( DID $did ) {
  * @return void
  */
 function on_resign( DID $did ) {
+	if ( ! current_user_can( 'manage_options' ) ) {
+		wp_die( __( 'You do not have sufficient permissions to access this function.', 'mini-fair' ) );
+	}
+
 	check_admin_referer( NONCE_PREFIX . ACTION_RESIGN );
 
 	try {
@@ -371,6 +375,10 @@ function on_resign( DID $did ) {
  * @return void
  */
 function on_add_key( DID $did ) {
+	if ( ! current_user_can( 'manage_options' ) ) {
+		wp_die( __( 'You do not have sufficient permissions to access this function.', 'mini-fair' ) );
+	}
+
 	// Handle adding a new verification key.
 	$did->generate_verification_key();
 
@@ -391,6 +399,10 @@ function on_add_key( DID $did ) {
  * @param DID $did The DID.
  */
 function on_revoke_key( DID $did ) {
+	if ( ! current_user_can( 'manage_options' ) ) {
+		wp_die( __( 'You do not have sufficient permissions to access this function.', 'mini-fair' ) );
+	}
+
 	// phpcs:ignore HM.Security.NonceVerification.Missing -- Nonce verification has already been performed.
 	$key_id = sanitize_text_field( wp_unslash( $_POST['key_id'] ?? '' ) );
 	if ( empty( $key_id ) ) {
