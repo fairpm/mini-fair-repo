@@ -548,7 +548,7 @@ function render_edit_page( WP_Post $post ) {
 					if ( empty( $diff ) ) {
 						echo '<p class="description">' . esc_html__( 'No changes detected. The PLC Directory is already up to date.', 'mini-fair' ) . '</p>';
 					} else {
-						echo '<div class="diff">' . esc_html( $diff ) . '</div>';
+						echo '<div class="diff">' . wp_kses_post( $diff ) . '</div>';
 					}
 					?>
 				</details>
