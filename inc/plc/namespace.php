@@ -44,6 +44,8 @@ function register_types() : void {
 		'public' => true,
 		'show_ui' => true,
 		'show_in_menu' => Admin\PAGE_SLUG,
+		'show_in_rest' => false,
+		// 'can_export' => false,
 		'supports' => [ 'title', 'editor', 'custom-fields' ],
 		'label' => __( 'PLC DIDs', 'mini-fair' ),
 		'labels' => [
