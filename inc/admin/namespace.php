@@ -292,6 +292,10 @@ function render_new_page( WP_Post $post ) {
  * @return void
  */
 function handle_action( int $post_id ) {
+	if ( ! current_user_can( 'manage_options' ) ) {
+		wp_die( __( 'You do not have sufficient permissions to access this page.', 'mini-fair' ) );
+	}
+
 	$post = get_post( $post_id );
 	if ( ! $post || $post->post_type !== DID::POST_TYPE ) {
 		return;
