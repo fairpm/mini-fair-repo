@@ -23,7 +23,7 @@ class MetadataDocument implements JsonSerializable {
 	/**
 	 * Package type.
 	 *
-	 * Example: 'wp-plugins' or 'wp-themes'.
+	 * Example: 'wp-plugin' or 'wp-theme'.
 	 *
 	 * @var string
 	 */
