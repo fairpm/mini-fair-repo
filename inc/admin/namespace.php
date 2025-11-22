@@ -195,9 +195,7 @@ function render_editor() {
 
 	require_once ABSPATH . 'wp-admin/admin-header.php';
 
-	if ( empty( $title ) ) {
-		$title = __( 'Create New PLC DID', 'mini-fair' );	
-	}
+	$title = $GLOBALS['title'] ?? __( 'Create New PLC DID', 'mini-fair' );
 
 	echo '<div class="wrap">';
 	echo '<h1 class="wp-heading-inline">';
