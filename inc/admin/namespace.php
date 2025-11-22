@@ -203,6 +203,8 @@ function render_editor() {
 
 	require_once ABSPATH . 'wp-admin/admin-header.php';
 
+	$title = $GLOBALS['title'] ?? __( 'Create New PLC DID', 'mini-fair' );
+
 	echo '<div class="wrap">';
 	echo '<h1 class="wp-heading-inline">';
 	echo esc_html( $title );
