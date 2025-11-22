@@ -1,0 +1,14 @@
+{
+    "landingPage": "wp-admin/admin.php?page=minifair",
+    "features": {
+        "networking": true
+    },
+    "plugins": [
+        "mini-fair-repo"
+    ],
+    "steps": [
+        {
+            "step": "login"
+        }
+    ]
+}
