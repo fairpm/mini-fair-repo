@@ -123,7 +123,12 @@ function render_settings_page() {
 							continue;
 						}
 						$data = MiniFAIR\get_package_metadata( $did );
-						$security_contact = $data->security[0] ?? 'N/A';
+						$security_contact = array_reduce(
+							$data->security,
+							fn ( $all, $current ) => array_merge( $all, array_values( $current ) ),
+							[]
+						);
+						$security_contact = implode( ', ', $security_contact ) ?: __( 'Not specified', 'mini-fair' );
 						?>
 						<td><code><?php echo esc_html( $package_id ); ?></code>
 							<a href="<?php echo esc_url( get_edit_post_link( $did->get_internal_post_id() ) ) ?>"><?php esc_html_e( '(View DID)', 'mini-fair' ) ?></a></td>
