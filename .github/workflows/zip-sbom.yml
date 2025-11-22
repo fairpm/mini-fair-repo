@@ -1,0 +1,81 @@
+name: Generate ZIP + SBOM
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build_artifact:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v5
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        fetch-depth: 0
+
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.3'
+        extensions: dom, curl, json
+        tools: wp-cli
+
+    - name: Check for composer.json
+      id: composer-check
+      run: |
+        if [ -f "composer.json" ]; then
+          echo "exists=true" >> $GITHUB_OUTPUT
+        else
+          echo "exists=false" >> $GITHUB_OUTPUT
+        fi
+    - name: Get Composer Cache Directory
+      if: steps.composer-check.outputs.exists == 'true'
+      id: composer-cache-dir
+      run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+    - name: Cache Composer dependencies
+      if: steps.composer-check.outputs.exists == 'true'
+      uses: actions/cache@v4
+      with:
+        path: ${{ steps.composer-cache-dir.outputs.dir }}
+        key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+        restore-keys: ${{ runner.os }}-composer-
+
+    - name: Install PHP dependencies
+      if: steps.composer-check.outputs.exists == 'true'
+      run: composer install --no-dev --optimize-autoloader --no-interaction
+
+    # === Generate SBOM before creating the build ===
+    - name: Install Syft
+      run: |
+        curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b /usr/local/bin
+
+    - name: Generate SBOM
+      run: syft . -o cyclonedx-json=sbom-${{ env.TAG_NAME }}.json
+
+    # === Build plugin ===
+    - name: Install latest version of dist-archive-command
+      run: wp package install wp-cli/dist-archive-command:@stable
+
+    - name: Build plugin
+      run: |
+        wp dist-archive . ./${{ github.event.repository.name }}.zip
+
+    # === Check that the SBOM was generated ===
+    - name: Verify SBOM exists
+      run: |
+        if [ ! -f "sbom-${{ env.TAG_NAME }}.json" ]; then
+          echo "SBOM generation failed"
+          exit 1
+        fi
+
+    # === Upload both artifact and SBOM to release ===
+    - name: Upload artifact to release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          sbom-${{ env.TAG_NAME }}.json
+          ${{ github.event.repository.name }}.zip
+        body: |
+          SBOM Format: CycloneDX JSON
+          Generated with: Syft
