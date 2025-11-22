@@ -111,6 +111,7 @@ function render_settings_page() {
 				<tr>
 					<th scope="col"><?php esc_html_e( 'Package ID', 'mini-fair' ); ?></th>
 					<th scope="col"><?php esc_html_e( 'Name', 'mini-fair' ); ?></th>
+					<th scope="col"><?php esc_html_e( 'Security Contact', 'mini-fair' ); ?></th>
 				</tr>
 			</thead>
 			<tbody>
@@ -122,10 +123,12 @@ function render_settings_page() {
 							continue;
 						}
 						$data = MiniFAIR\get_package_metadata( $did );
+						$security_contact = $data->security[0] ?? 'N/A';
 						?>
 						<td><code><?php echo esc_html( $package_id ); ?></code>
 							<a href="<?php echo esc_url( get_edit_post_link( $did->get_internal_post_id() ) ) ?>"><?php esc_html_e( '(View DID)', 'mini-fair' ) ?></a></td>
 						<td><?php echo esc_html( $data->name ); ?></td>
+						<td><?php echo esc_html( $security_contact ); ?></td>
 					</tr>
 				<?php endforeach; ?>
 		</table>
